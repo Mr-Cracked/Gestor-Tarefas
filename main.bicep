@@ -66,7 +66,32 @@ resource tasksContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/cont
     }
   }
 }
+/*
+// Secret para acesso ao Blob
+resource storageKeys 'Microsoft.Storage/storageAccounts/listKeys/action@2023-01-01' = {
+  name: 'listKeys'
+  parent: storageAccount
+}
 
+var connectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageKeys.value.keys[0].value};EndpointSuffix=core.windows.net'
+
+containerApp.properties.configuration.secrets += [
+  {
+    name: 'storage-connection-string'
+    value: connectionString
+  }
+]
+
+// E depois podes usar no container:
+containerApp.properties.template.containers[0].env += [
+  {
+    name: 'AZURE_STORAGE_CONNECTION_STRING'
+    secretRef: 'storage-connection-string'
+  }
+]*/
+
+
+/*
 // Container App Environment
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: containerEnvName
@@ -118,7 +143,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     }
   }
 }
-
+*/
 output cosmosDbEndpoint string = cosmosDb.properties.documentEndpoint
 output cosmosDbKey string = listKeys(cosmosDb.id, '2023-04-15').primaryMasterKey
-output containerAppUrl string = 'https://${containerAppName}.${location}.azurecontainerapps.io'
+//output containerAppUrl string = 'https://${containerAppName}.${location}.azurecontainerapps.io'

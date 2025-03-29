@@ -11,11 +11,12 @@ const client = new CosmosClient({
     endpoint: process.env.COSMOS_DB_ENDPOINT,
     key: process.env.COSMOS_DB_KEY,
 });
-const database = client.database("TaskManagerDB");
+const database = client.database("GestorTarefasDB");
 const container = database.container("Tarefa");
 
+
 // Criar nova tarefa
-router.post('/', async (req, res) => {
+router.post('/criar', async (req, res) => {
     const { titulo, descricao, prazo, prioridade, estado, anexos } = req.body;
     const email = req.session.userEmail;
 
@@ -27,19 +28,19 @@ router.post('/', async (req, res) => {
         res.status(201).json(novaTarefa);
     } catch (err) {
         res.status(500).json({ error: 'Erro ao criar tarefa.' });
+        console.log(err);
     }
 });
 
 // Listar tarefas do utilizador
-router.get('/', async (req, res) => {
+router.get('/listar', async (req, res) => {
     const email = req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
-
     try {
         const { resources: tarefas } = await container.items
             .query({
-                query: 'SELECT * FROM c WHERE c.email = @email',
+                query: 'SELECT * FROM Tarefa c WHERE c.email = @email',
                 parameters: [{ name: '@email', value: email }]
             })
             .fetchAll();
@@ -67,17 +68,18 @@ router.put('/:id', async (req, res) => {
 });
 
 // Eliminar tarefa
-router.delete('/:id', async (req, res) => {
+router.delete('/remover/:id', async (req, res) => {
     const { id } = req.params;
     const email = req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
 
     try {
-        await container.item(id, id).delete();
+        await container.item(id,email).delete();
         res.status(200).json({ message: 'Tarefa removida com sucesso.' });
     } catch (err) {
         res.status(500).json({ error: 'Erro ao remover tarefa.' });
+        console.log(err)
     }
 });
 

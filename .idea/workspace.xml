@@ -8,9 +8,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BackEnd/.dockerignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/.env" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/models/Tarefa.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/models/Tarefa.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/routes/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/routes/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/routes/tarefas.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/routes/tarefas.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/server.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.bicep" beforeDir="false" afterPath="$PROJECT_DIR$/main.bicep" afterDir="false" />
     </list>
@@ -37,22 +42,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;Shell Script.deploy.sh.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/school/MeuIPCB&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Shell Script.deploy.sh.executor": "Run",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/school/MeuIPCB",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.start.executor": "Run",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2024.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager">
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\school\Gestor-Tarefas\BackEnd" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.start">
     <configuration name="deploy.sh" type="ShConfigurationType" temporary="true">
       <option name="SCRIPT_TEXT" value="" />
       <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
@@ -68,8 +80,19 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/BackEnd/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.start" />
         <item itemvalue="Shell Script.deploy.sh" />
       </list>
     </recent_temporary>
@@ -91,6 +114,7 @@
       <updated>1743120647233</updated>
       <workItem from="1743120648322" duration="6269000" />
       <workItem from="1743270577318" duration="3814000" />
+      <workItem from="1743280514875" duration="5252000" />
     </task>
     <servers />
   </component>

@@ -12,7 +12,7 @@ const client = new CosmosClient({
     endpoint: process.env.COSMOS_DB_ENDPOINT,
     key: process.env.COSMOS_DB_KEY
 });
-const database = client.database("TaskManagerDB");
+const database = client.database("GestorTarefasDB");
 const container = database.container("Utilizador");
 
 // REGISTO
@@ -74,6 +74,7 @@ router.post('/login', async (req, res) => {
         res.status(200).json({ message: 'Login com sucesso.', email });
     } catch (err) {
         res.status(500).json({ error: 'Erro ao fazer login.' });
+        console.log(err)
     }
 });
 

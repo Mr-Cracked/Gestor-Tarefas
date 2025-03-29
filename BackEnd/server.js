@@ -14,19 +14,20 @@ const port = process.env.PORT;
 
 app.use(cors());
 app.use(bodyParser.json());
-
-app.use('/api/auth',authRoutes);
-app.use('/api/tarefas',taskRoutes);
-app.use('/api/uploads',uploadRoutes);
     
 app.use(session({
     secret: 'amarelo12345', // pode ser definida no .env
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 // 1 hora
+        maxAge: 1000 * 60 * 60, // 1 hora
+        secure: true
     }
 }));
+
+app.use('/api/auth',authRoutes);
+app.use('/api/tarefas',taskRoutes);
+app.use('/api/uploads',uploadRoutes);
 
 
 app.listen(port, () => {
