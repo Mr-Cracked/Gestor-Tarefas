@@ -123,12 +123,14 @@ az container create `
   --registry-username $acrUsername `
   --registry-password $acrPassword `
   --environment-variables `
+    PORT=3000 `
     COSMOS_DB_ENDPOINT=$cosmosEndpoint `
     COSMOS_DB_KEY=$cosmosKey `
   --ports 3000 `
   --dns-name-label $dnsLabel `
   --os-type Linux `
   --location $location
+
 
 # ================================
 # Conclusão

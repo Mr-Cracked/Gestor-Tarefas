@@ -1,6 +1,13 @@
+console.log("Starting server...");
+console.log("PORT:", process.env.PORT);
+console.log("COSMOS_DB_ENDPOINT:", process.env.COSMOS_DB_ENDPOINT);
+
+
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
+
 const bodyParser = require('body-parser');
 const session = require('express-session')
 
