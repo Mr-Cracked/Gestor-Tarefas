@@ -1,17 +1,44 @@
-#!/bin/bash
-
-# Nome do resource group
+# Parâmetros
 RG_NAME="gestorTarefasCN"
-# Localização
 LOCATION="francecentral"
-# Nome único da conta Cosmos DB
-COSMOS_NAME="dbtarefas$(date +%s)"
+COSMOS_NAME="gestortarefas20220393"
+DB_NAME="GestorTarefasDB"
 
-echo "Criar grupo de recursos: $RG_NAME"
+echo "Faça login..."
+az login
+
+echo "A criar Resource Group..."
 az group create --name $RG_NAME --location $LOCATION
 
-echo "Fazer deploy do Bicep para o grupo: $RG_NAME"
-az deployment group create \
+echo "A criar conta Cosmos DB..."
+az cosmosdb create \
+  --name $COSMOS_NAME \
   --resource-group $RG_NAME \
-  --template-file main.bicep \
-  --parameters cosmosDbAccountName=$COSMOS_NAME
+  --locations regionName=$LOCATION failoverPriority=0 \
+  --default-consistency-level Session \
+  --kind GlobalDocumentDB
+
+echo "A criar base de dados '$DB_NAME'..."
+az cosmosdb sql database create \
+  --account-name $COSMOS_NAME \
+  --resource-group $RG_NAME \
+  --name $DB_NAME
+
+echo "📁 A criar container 'Users'..."
+az cosmosdb sql container create \
+  --account-name "$COSMOS_NAME" \
+  --resource-group "$RG_NAME" \
+  --database-name "$DB_NAME" \
+  --name Utilizador \
+  --partition-key-path='/email'
+
+echo "📁 A criar container 'Tasks'..."
+az cosmosdb sql container create \
+  --account-name "$COSMOS_NAME" \
+  --resource-group "$RG_NAME" \
+  --database-name "$DB_NAME" \
+  --name Tarefa \
+  --partition-key-path='/email'
+
+echo "Infraestrutura criada com sucesso!"
+
