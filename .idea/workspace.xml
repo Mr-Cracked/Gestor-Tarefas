@@ -10,7 +10,6 @@
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.ps1" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +54,8 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas\azure-function-lembrete" />
+      <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas\azure-function-lembrete\lembrete" />
       <recent name="C:\school\Gestor-Tarefas\BackEnd" />
     </key>
   </component>
@@ -112,7 +113,8 @@
       <workItem from="1743801254268" duration="553000" />
       <workItem from="1743801831109" duration="8838000" />
       <workItem from="1743867643909" duration="6888000" />
-      <workItem from="1743876673497" duration="2078000" />
+      <workItem from="1743876673497" duration="3438000" />
+      <workItem from="1743957131124" duration="8643000" />
     </task>
     <servers />
   </component>

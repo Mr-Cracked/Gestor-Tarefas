@@ -19,7 +19,9 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+    credentials: true
+}));
 app.use(bodyParser.json());
     
 app.use(session({
@@ -27,8 +29,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60, // 1 hora
-        secure: true
+        secure: true,
+        httpOnly: true,
+        sameSite: 'none',
+        maxAge: 3600000
     }
 }));
 
