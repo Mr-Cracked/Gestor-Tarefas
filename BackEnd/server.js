@@ -23,15 +23,15 @@ app.use(cors({
     credentials: true
 }));
 app.use(bodyParser.json());
-    
+
 app.use(session({
-    secret: 'amarelo12345', // pode ser definida no .env
+    secret: 'amarelo12345',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: true,
         httpOnly: true,
-        sameSite: 'none',
+        secure: false,
+        sameSite: 'lax',
         maxAge: 3600000
     }
 }));
