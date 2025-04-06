@@ -7,10 +7,7 @@
     <option name="ignoreLsDownloadSuggestion" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/server.js" afterDir="false" />
-    </list>
+    <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,7 +111,7 @@
       <workItem from="1743801831109" duration="8838000" />
       <workItem from="1743867643909" duration="6888000" />
       <workItem from="1743876673497" duration="3438000" />
-      <workItem from="1743957131124" duration="9703000" />
+      <workItem from="1743957131124" duration="10366000" />
     </task>
     <servers />
   </component>

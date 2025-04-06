@@ -69,14 +69,25 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Credenciais inválidas.' });
         }
 
+        // Guarda o email na sessão
         req.session.userEmail = email;
 
-        res.status(200).json({ message: 'Login com sucesso.', email });
+        // 🟡 Salva a sessão ANTES de responder
+        req.session.save((err) => {
+            if (err) {
+                console.error("Erro ao salvar a sessão:", err);
+                return res.status(500).json({ error: "Erro ao salvar sessão." });
+            }
+
+            res.status(200).json({ message: 'Login com sucesso.', email });
+        });
+
     } catch (err) {
         res.status(500).json({ error: 'Erro ao fazer login.' });
-        console.log(err)
+        console.log(err);
     }
 });
+
 
 // LOGOUT
 router.post('/logout', (req, res) => {
