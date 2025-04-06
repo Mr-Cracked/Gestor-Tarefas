@@ -18,7 +18,7 @@ const container = database.container("Tarefa");
 // Criar nova tarefa
 router.post('/criar', async (req, res) => {
     const { titulo, descricao, prazo, prioridade, estado, anexos } = req.body;
-    const email = req.session.userEmail;
+    const email = "guilherme.roque@ipcbcampus.pt"; //req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
 
@@ -34,7 +34,7 @@ router.post('/criar', async (req, res) => {
 
 // Listar tarefas do utilizador
 router.get('/listar', async (req, res) => {
-    const email = req.session.userEmail;
+    const email = "guilherme.roque@ipcbcampus.pt"; //req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
     try {
@@ -54,7 +54,7 @@ router.get('/listar', async (req, res) => {
 // Atualizar tarefa
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const email = req.session.userEmail;
+    const email = "guilherme.roque@ipcbcampus.pt"; //req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
 
@@ -70,7 +70,7 @@ router.put('/:id', async (req, res) => {
 // Eliminar tarefa
 router.delete('/remover/:id', async (req, res) => {
     const { id } = req.params;
-    const email = req.session.userEmail;
+    const email = "guilherme.roque@ipcbcampus.pt"; //req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
 
