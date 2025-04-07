@@ -16,7 +16,6 @@ $acrLoginServer = "$acrName.azurecr.io"
 # GitHub
 $gitRepo = "https://github.com/Mr-Cracked/Gestor-Tarefas.git"
 $gitBranch = "main"
-$dockerPath = "BackEnd"
 
 # ================================
 # Criar Resource Group
@@ -133,50 +132,37 @@ az container create `
 
 
 # ================================
-# Criar Storage Account para Function App
+# Criar Function App (Azure Functions)
 # ================================
-$functionStorage = "gestorfuncstorage202203"
-Write-Host "`nA criar Storage Account para Function App: $functionStorage..."
+
+$storageAccount = "gestortarefasstor202203"
+
+Write-Host "`nA criar Storage Account: $storageAccount..."
 az storage account create `
-  --name $functionStorage `
+  --name $storageAccount `
   --location $location `
   --resource-group $rg `
-  --sku Standard_LRS
-
-# ================================
-# Criar plano de consumo
-# ================================
-$funcPlan = "GestorTarefasFuncPlan"
+  --sku Standard_LRS `
+  --kind StorageV2
 
 
-az functionapp plan create `
-  --name $funcPlan `
-  --resource-group $rg `
-  --location $location `
-  --number-of-workers 1 `
-  --sku Y1 `
-  --is-linux
-
-# ================================
-# Criar Function App (Python)
-# ================================
 $functionAppName = "GestorTarefasFunctionApp202203"
 
 Write-Host "`nA criar Function App: $functionAppName..."
 az functionapp create `
   --name $functionAppName `
-  --storage-account $functionStorage `
   --resource-group $rg `
-  --plan $funcPlan `
+  --consumption-plan-location $location `
   --runtime python `
   --runtime-version 3.11 `
   --functions-version 4 `
-  --os-type Linux
+  --os-type Linux `
+  --storage-account $storageAccount `
+  --disable-app-insights true
 
-# ================================
-# Configurar variáveis de ambiente da Function
-# ================================
-Write-Host "`nA configurar variáveis de ambiente da Function App..."
+
+Write-Host "`nA configurar variaveis de ambiente na Function App..."
+
 az functionapp config appsettings set `
   --name $functionAppName `
   --resource-group $rg `
@@ -184,21 +170,19 @@ az functionapp config appsettings set `
     COSMOS_DB_ENDPOINT=$cosmosEndpoint `
     COSMOS_DB_KEY=$cosmosKey `
     COSMOS_DB_NAME=$dbName `
-    COSMOS_CONTAINER_NAME="Tarefa" `
+    COSMOS_CONTAINER_NAME="Tarefa"`
     MAILJET_API_KEY="f1d2c3fa8fbab3a7932d746b28f26257" `
     MAILJET_SECRET_KEY="b189e2bc3361bc8811c908682627785a"
 
-# ================================
-# Ligar Function App ao GitHub
-# ================================
-Write-Host "`nA configurar deploy contínuo do GitHub na Function App..."
+
+Write-Host "`nA configurar deploy do GitHub..."
+
 az functionapp deployment source config `
   --name $functionAppName `
   --resource-group $rg `
   --repo-url $gitRepo `
   --branch $gitBranch `
-  --manual-integration `
-  --app-working-dir "azure-function-lembrete"
+  --manual-integration
 
 
 
