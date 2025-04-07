@@ -53,7 +53,7 @@ router.get('/listar', async (req, res) => {
 
 // Atualizar tarefa
 router.put('/:id', async (req, res) => {
-    const { id } = req.params;
+    const id = req.params;
     const email = req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
@@ -67,9 +67,30 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+// Listar uma tarefa do utilizador
+router.get('/listar/:id', async (req, res) => {
+    const email = req.session.userEmail;
+    const id = req.params.id;
+
+    if (!email) return res.status(403).json({ error: 'Não autenticado' });
+    try {
+        const { resources: tarefas } = await container.items
+            .query({
+                query: 'SELECT * FROM Tarefa c WHERE c.id = @id',
+                parameters: [{ name: '@id', value: id }]
+            })
+            .fetchAll();
+
+        res.status(200).json(tarefas);
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao listar tarefas.' });
+    }
+});
+
+
 // Eliminar tarefa
 router.delete('/remover/:id', async (req, res) => {
-    const { id } = req.params;
+    const id  = req.params;
     const email = req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });

@@ -9,10 +9,9 @@
   <component name="ChangeListManager">
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__azurite_db_blob__.json" beforeDir="false" afterPath="$PROJECT_DIR$/__azurite_db_blob__.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__azurite_db_blob_extent__.json" beforeDir="false" afterPath="$PROJECT_DIR$/__azurite_db_blob_extent__.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__blobstorage__/2f8e1b3f-46a2-4dd5-99be-10c2003a50b8" beforeDir="false" afterPath="$PROJECT_DIR$/__blobstorage__/2f8e1b3f-46a2-4dd5-99be-10c2003a50b8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/routes/tarefas.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/routes/tarefas.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/azure-function-lembrete/function_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/azure-function-lembrete/function_app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.ps1" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +116,8 @@
       <workItem from="1743801831109" duration="8838000" />
       <workItem from="1743867643909" duration="6888000" />
       <workItem from="1743876673497" duration="3438000" />
-      <workItem from="1743957131124" duration="17164000" />
+      <workItem from="1743957131124" duration="17340000" />
+      <workItem from="1744063837497" duration="1505000" />
     </task>
     <servers />
   </component>

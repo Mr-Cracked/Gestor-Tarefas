@@ -6,7 +6,8 @@ from azure.cosmos import CosmosClient
 from mailjet_rest import Client
 
 app = func.FunctionApp()
-
+#depois colocar 0 0 8 * * *
+#agora só esta a cada minuto por motivos de verificação
 @app.function_name(name="lembrete")
 @app.schedule(schedule="*/1 * * * *", arg_name="mytimer", run_on_startup=False, use_monitor=True)
 def lembrete_func(mytimer: func.TimerRequest) -> None:

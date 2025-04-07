@@ -133,8 +133,77 @@ az container create `
 
 
 # ================================
+# Criar Storage Account para Function App
+# ================================
+$functionStorage = "gestorfuncstorage$RANDOM"
+Write-Host "`nA criar Storage Account para Function App: $functionStorage..."
+az storage account create `
+  --name $functionStorage `
+  --location $location `
+  --resource-group $rg `
+  --sku Standard_LRS
+
+# ================================
+# Criar plano de consumo
+# ================================
+$functionPlan = "GestorTarefasFuncPlan"
+az functionapp plan create `
+  --name $functionPlan `
+  --resource-group $rg `
+  --location $location `
+  --number-of-workers 1 `
+  --sku Y1 `
+  --is-linux
+
+# ================================
+# Criar Function App (Python)
+# ================================
+$functionAppName = "GestorTarefasFunctionApp202203"
+
+Write-Host "`nA criar Function App: $functionAppName..."
+az functionapp create `
+  --name $functionAppName `
+  --storage-account $functionStorage `
+  --resource-group $rg `
+  --plan $functionPlan `
+  --runtime python `
+  --runtime-version 3.11 `
+  --functions-version 4 `
+  --os-type Linux
+
+# ================================
+# Configurar variáveis de ambiente da Function
+# ================================
+Write-Host "`nA configurar variáveis de ambiente da Function App..."
+az functionapp config appsettings set `
+  --name $functionAppName `
+  --resource-group $rg `
+  --settings `
+    COSMOS_DB_ENDPOINT=$cosmosEndpoint `
+    COSMOS_DB_KEY=$cosmosKey `
+    COSMOS_DB_NAME=$dbName `
+    COSMOS_CONTAINER_NAME="Tarefa" `
+    MAILJET_API_KEY="f1d2c3fa8fbab3a7932d746b28f26257" `
+    MAILJET_SECRET_KEY="b189e2bc3361bc8811c908682627785a"
+
+# ================================
+# Ligar Function App ao GitHub
+# ================================
+Write-Host "`nA configurar deploy contínuo do GitHub na Function App..."
+az functionapp deployment source config `
+  --name $functionAppName `
+  --resource-group $rg `
+  --repo-url $gitRepo `
+  --branch $gitBranch `
+  --manual-integration `
+  --app-working-dir "azure-function-lembrete"
+
+
+
+# ================================
 # Conclusão
 # ================================
 Write-Host "`nInfraestrutura criada com sucesso."
 Write-Host "URL pública do backend: http://$dnsLabel.$location.azurecontainer.io:3000"
 Write-Host "Nome do ACR: $acrName"
+Write-Host "Nome da Function: $functionAppName"
