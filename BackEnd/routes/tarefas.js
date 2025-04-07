@@ -52,7 +52,7 @@ router.get('/listar', async (req, res) => {
 });
 
 // Atualizar tarefa
-router.put('/:id', async (req, res) => {
+router.put('/atualizar/:id', async (req, res) => {
     const id = req.params;
     const email = req.session.userEmail;
 

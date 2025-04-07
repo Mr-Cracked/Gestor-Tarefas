@@ -135,7 +135,7 @@ az container create `
 # ================================
 # Criar Storage Account para Function App
 # ================================
-$functionStorage = "gestorfuncstorage$RANDOM"
+$functionStorage = "gestorfuncstorage202203"
 Write-Host "`nA criar Storage Account para Function App: $functionStorage..."
 az storage account create `
   --name $functionStorage `
@@ -146,9 +146,11 @@ az storage account create `
 # ================================
 # Criar plano de consumo
 # ================================
-$functionPlan = "GestorTarefasFuncPlan"
+$funcPlan = "GestorTarefasFuncPlan"
+
+
 az functionapp plan create `
-  --name $functionPlan `
+  --name $funcPlan `
   --resource-group $rg `
   --location $location `
   --number-of-workers 1 `
@@ -165,7 +167,7 @@ az functionapp create `
   --name $functionAppName `
   --storage-account $functionStorage `
   --resource-group $rg `
-  --plan $functionPlan `
+  --plan $funcPlan `
   --runtime python `
   --runtime-version 3.11 `
   --functions-version 4 `
