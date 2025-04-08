@@ -8,7 +8,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/BackEnd/routes/tarefas.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/routes/tarefas.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/function_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/function/function_app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/host.json" beforeDir="false" afterPath="$PROJECT_DIR$/function/host.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local.settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/function/local.settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/function/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +57,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas\function" />
       <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas" />
       <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas\azure-function-lembrete" />
       <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas\azure-function-lembrete\lembrete" />
@@ -115,7 +120,8 @@
       <workItem from="1743867643909" duration="6888000" />
       <workItem from="1743876673497" duration="3438000" />
       <workItem from="1743957131124" duration="17340000" />
-      <workItem from="1744063837497" duration="13908000" />
+      <workItem from="1744063837497" duration="16189000" />
+      <workItem from="1744134528472" duration="1533000" />
     </task>
     <servers />
   </component>
