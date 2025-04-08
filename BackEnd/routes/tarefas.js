@@ -51,22 +51,6 @@ router.get('/listar', async (req, res) => {
     }
 });
 
-// Atualizar tarefa
-router.put('/atualizar/:id', async (req, res) => {
-    const { id } = req.params;
-    const email = req.session.userEmail;
-
-    if (!email) return res.status(403).json({ error: 'Não autenticado' });
-
-    try {
-        const updated = { ...req.body, id, email };
-        await container.item(id, id).replace(updated);
-        res.status(200).json({ message: 'Tarefa atualizada com sucesso.' });
-    } catch (err) {
-        res.status(500).json({ error: 'Erro ao atualizar tarefa.' });
-    }
-});
-
 // Listar uma tarefa do utilizador
 router.get('/listar/:id', async (req, res) => {
     const email = req.session.userEmail;
@@ -83,13 +67,25 @@ router.get('/listar/:id', async (req, res) => {
 
         res.status(200).json(tarefas);
     } catch (err) {
-        res.status(500).json({
-            error: 'Erro ao atualizar tarefa.',
-            detalhes: err.message || err.toString()
-        });
+        res.status(500).json({ error: 'Erro ao listar tarefas.' });
     }
 });
 
+// Atualizar tarefa
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const email = req.session.userEmail;
+
+    if (!email) return res.status(403).json({ error: 'Não autenticado' });
+
+    try {
+        const updated = { ...req.body, id, email };
+        await container.item(id, id).replace(updated);
+        res.status(200).json({ message: 'Tarefa atualizada com sucesso.' });
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao atualizar tarefa.' });
+    }
+});
 
 // Eliminar tarefa
 router.delete('/remover/:id', async (req, res) => {
@@ -102,10 +98,8 @@ router.delete('/remover/:id', async (req, res) => {
         await container.item(id,email).delete();
         res.status(200).json({ message: 'Tarefa removida com sucesso.' });
     } catch (err) {
-        res.status(500).json({
-            error: 'Erro ao remover tarefa.',
-            detalhes: err.message || err.toString()
-        });
+        res.status(500).json({ error: 'Erro ao remover tarefa.' });
+        console.log(err)
     }
 });
 
