@@ -1,7 +1,7 @@
 # ================================
 # Parâmetros principais
 # ================================
-$rg = "gestorTarefasRG"
+$rg = "gestorTarefasCN"
 $location = "francecentral"
 $cosmosName = "gestortarefas202203"
 $dbName = "GestorTarefasDB"
@@ -17,15 +17,11 @@ $acrLoginServer = "$acrName.azurecr.io"
 $gitRepo = "https://github.com/Mr-Cracked/Gestor-Tarefas.git"
 $gitBranch = "main"
 
-# ================================
-# Criar Resource Group
-# ================================
+
 Write-Host "`nA criar Resource Group: $rg..."
 az group create --name $rg --location $location
 
-# ================================
-# Criar conta Cosmos DB
-# ================================
+
 Write-Host "`nA criar conta Cosmos DB: $cosmosName..."
 az cosmosdb create `
   --name $cosmosName `
@@ -34,9 +30,7 @@ az cosmosdb create `
   --default-consistency-level Session `
   --kind GlobalDocumentDB
 
-# ================================
-# Criar base de dados e containers
-# ================================
+
 Write-Host "`nA criar base de dados '$dbName'..."
 az cosmosdb sql database create `
   --account-name $cosmosName `
@@ -59,9 +53,7 @@ az cosmosdb sql container create `
   --name Tarefa `
   --partition-key-path "/email"
 
-# ================================
-# Criar ACR e ativar admin
-# ================================
+
 Write-Host "`nA criar Azure Container Registry '$acrName'..."
 az acr create `
   --resource-group $rg `
@@ -72,9 +64,7 @@ az acr create `
 Write-Host "`nA ativar o acesso administrativo ao ACR..."
 az acr update --name $acrName --resource-group $rg --admin-enabled true
 
-# ================================
-# Criar ACR Task
-# ================================
+
 az acr task create `
   --registry $acrName `
   --name build-task-gestor-tarefas `
@@ -88,27 +78,19 @@ az acr task create `
   --base-image-trigger-enabled true
 
 
-# ================================
-# Executar build inicial manualmente (opcional)
-# ================================
+
 Write-Host "`nA executar build inicial do ACR Task..."
 az acr task run --registry $acrName --name build-task-gestor-tarefas --resource-group $rg
 
-# ================================
-# Obter Cosmos DB credentials
-# ================================
+
 $cosmosEndpoint = $(az cosmosdb show --name $cosmosName --resource-group $rg --query "documentEndpoint" -o tsv)
 $cosmosKey = $(az cosmosdb keys list --name $cosmosName --resource-group $rg --query "primaryMasterKey" -o tsv)
 
-# ================================
-# Obter ACR credentials
-# ================================
+
 $acrUsername = $(az acr credential show --name $acrName --query username -o tsv)
 $acrPassword = $(az acr credential show --name $acrName --query passwords[0].value -o tsv)
 
-# ================================
-# Criar Container Instance
-# ================================
+
 Write-Host "`nA criar Container Instance com imagem '$imageName'..."
 az container create `
   --resource-group $rg `
@@ -129,9 +111,7 @@ az container create `
   --location $location
 
 
-# ================================
-# Criar Function App (Azure Functions)
-# ================================
+
 
 $storageAccount = "gestortarefasstor202203"
 

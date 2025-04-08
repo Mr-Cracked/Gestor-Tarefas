@@ -84,6 +84,7 @@ router.get('/listar/:id', async (req, res) => {
         res.status(200).json(tarefas);
     } catch (err) {
         res.status(500).json({ error: 'Erro ao listar tarefas.' });
+        console.log(err)
     }
 });
 
@@ -100,7 +101,7 @@ router.delete('/remover/:id', async (req, res) => {
         res.status(200).json({ message: 'Tarefa removida com sucesso.' });
     } catch (err) {
         res.status(500).json({ error: 'Erro ao remover tarefa.' });
-
+        console.log(err)
     }
 });
 
