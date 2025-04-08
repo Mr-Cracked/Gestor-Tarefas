@@ -9,6 +9,16 @@
   <component name="ChangeListManager">
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AzuriteConfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__azurite_db_blob__.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__azurite_db_blob_extent__.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__azurite_db_queue__.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__azurite_db_queue_extent__.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__azurite_db_table__.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/azure-function-lembrete/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/azure-function-lembrete/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/azure-function-lembrete/function_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/function_app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/azure-function-lembrete/host.json" beforeDir="false" afterPath="$PROJECT_DIR$/host.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/azure-function-lembrete/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deploy.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.ps1" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -54,6 +64,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas" />
       <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas\azure-function-lembrete" />
       <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas\azure-function-lembrete\lembrete" />
       <recent name="C:\school\Gestor-Tarefas\BackEnd" />
@@ -115,7 +126,7 @@
       <workItem from="1743867643909" duration="6888000" />
       <workItem from="1743876673497" duration="3438000" />
       <workItem from="1743957131124" duration="17340000" />
-      <workItem from="1744063837497" duration="6210000" />
+      <workItem from="1744063837497" duration="9738000" />
     </task>
     <servers />
   </component>

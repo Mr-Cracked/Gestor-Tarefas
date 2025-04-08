@@ -73,10 +73,8 @@ Write-Host "`nA ativar o acesso administrativo ao ACR..."
 az acr update --name $acrName --resource-group $rg --admin-enabled true
 
 # ================================
-# Criar ACR Task (build automático a partir do GitHub)
+# Criar ACR Task
 # ================================
-# Criar ACR Task (build automático a partir do GitHub)
-# Criar ACR Task (build automático do GitHub, sem triggers)
 az acr task create `
   --registry $acrName `
   --name build-task-gestor-tarefas `
@@ -182,7 +180,6 @@ az functionapp deployment source config `
   --resource-group $rg `
   --repo-url $gitRepo `
   --branch $gitBranch `
-  --manual-integration
 
 
 
