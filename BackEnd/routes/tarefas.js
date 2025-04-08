@@ -80,7 +80,7 @@ router.put('/:id', async (req, res) => {
 
     try {
         const updated = { ...req.body, id, email };
-        await container.item(id, id).replace(updated);
+        await container.item(id, email).replace(updated);
         res.status(200).json({ message: 'Tarefa atualizada com sucesso.' });
     } catch (err) {
         res.status(500).json({ error: 'Erro ao atualizar tarefa.' });
