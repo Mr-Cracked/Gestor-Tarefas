@@ -53,7 +53,7 @@ router.get('/listar', async (req, res) => {
 
 // Atualizar tarefa
 router.put('/atualizar/:id', async (req, res) => {
-    const id = req.params;
+    const { id } = req.params.id;
     const email = req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
@@ -70,7 +70,7 @@ router.put('/atualizar/:id', async (req, res) => {
 // Listar uma tarefa do utilizador
 router.get('/listar/:id', async (req, res) => {
     const email = req.session.userEmail;
-    const id = req.params.id;
+    const { id } = req.params.id;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
     try {
@@ -90,7 +90,7 @@ router.get('/listar/:id', async (req, res) => {
 
 // Eliminar tarefa
 router.delete('/remover/:id', async (req, res) => {
-    const id  = req.params;
+    const { id } = req.params.id;
     const email = req.session.userEmail;
 
     if (!email) return res.status(403).json({ error: 'Não autenticado' });
