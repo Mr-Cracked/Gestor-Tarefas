@@ -4,17 +4,17 @@ import os
 import logging
 from azure.cosmos import CosmosClient
 from mailjet_rest import Client
+from collections import defaultdict
 
 app = func.FunctionApp()
 
-# Corre a cada minuto para testes. Produção: "0 0 8 * * *"
 @app.function_name(name="lembrete")
 @app.schedule(schedule="*/1 * * * *", arg_name="mytimer", run_on_startup=False, use_monitor=True)
 def lembrete_func(mytimer: func.TimerRequest) -> None:
     hoje = datetime.datetime.utcnow().date()
 
     try:
-        # Variáveis de ambiente
+        # Variaveis de ambiente
         endpoint = os.environ["COSMOS_DB_ENDPOINT"]
         key = os.environ["COSMOS_DB_KEY"]
         db_name = os.environ["COSMOS_DB_NAME"]
@@ -30,11 +30,15 @@ def lembrete_func(mytimer: func.TimerRequest) -> None:
         mailjet = Client(auth=(mailjet_api_key, mailjet_secret), version='v3.1')
 
         tarefas = list(container.read_all_items())
-        mensagens = []
+
+        # Agrupar tarefas proximas do fim por email
+        tarefas_por_email = defaultdict(list)
 
         for tarefa in tarefas:
             prazo_str = tarefa.get("prazo")
-            if not prazo_str:
+            email = tarefa.get("email")
+
+            if not prazo_str or not email:
                 continue
 
             try:
@@ -43,34 +47,36 @@ def lembrete_func(mytimer: func.TimerRequest) -> None:
                 continue
 
             dias_restantes = (prazo_data - hoje).days
-
             if 0 <= dias_restantes <= 2:
-                email = tarefa.get("email")
-                titulo = tarefa.get("titulo") or "Tarefa sem titulo"
+                tarefas_por_email[email].append(tarefa)
 
-                mensagens.append({
-                    "From": {
-                        "Email": remetente,
-                        "Name": "Gestor de Tarefas"
-                    },
-                    "To": [
-                        {
-                            "Email": email,
-                            "Name": "Utilizador"
-                        }
-                    ],
-                    "Subject": "Lembrete de tarefa proxima do prazo",
-                    "HTMLPart": f"<strong>A tarefa '{titulo}' termina em {dias_restantes} dia(s).</strong>"
-                })
+        mensagens = []
+
+        for email, lista in tarefas_por_email.items():
+            total = len(lista)
+            mensagens.append({
+                "From": {
+                    "Email": remetente,
+                    "Name": "Gestor de Tarefas"
+                },
+                "To": [
+                    {
+                        "Email": email,
+                        "Name": "Utilizador"
+                    }
+                ],
+                "Subject": "Lembrete de tarefas proximas do prazo",
+                "HTMLPart": f"<strong>Tens {total} tarefa(s) com o prazo proximo do fim.</strong>"
+            })
 
         if mensagens:
             result = mailjet.send.create(data={"Messages": mensagens})
             if result.status_code == 200:
-                logging.info(f"{len(mensagens)} lembretes enviados com sucesso.")
+                logging.info(f"{len(mensagens)} mensagens enviadas com sucesso.")
             else:
                 logging.warning(f"Erro ao enviar mensagens: {result.status_code} - {result.json()}")
         else:
-            logging.info("Nenhum lembrete para enviar hoje.")
+            logging.info("Nenhuma mensagem a enviar.")
 
     except Exception as e:
-        logging.error(f"Erro ao enviar lembretes: {e}")
+        logging.error(f"Erro na funcao lembrete: {e}")
