@@ -149,15 +149,15 @@ az functionapp config appsettings set \
   --name "$functionAppName" \
   --resource-group "$rg" \
   --settings \
-    "COSMOS_DB_ENDPOINT=$cosmosEndpoint" \
-    "COSMOS_DB_KEY=$cosmosKey" \
-    "COSMOS_DB_NAME=$dbName" \
-    "COSMOS_CONTAINER_NAME=Tarefa" \
-    "MAILJET_API_KEY=f1d2c3fa8fbab3a7932d746b28f26257" \
-    "MAILJET_SECRET_KEY=b189e2bc3361bc8811c908682627785a" \
-    "FUNCTIONS_WORKER_RUNTIME=python" \
-    "FUNCTIONS_EXTENSION_VERSION=~4" \
-    "AzureWebJobsStorage=$storageConnStr"
+    COSMOS_DB_ENDPOINT="$cosmosEndpoint" \
+    COSMOS_DB_KEY="$cosmosKey" \
+    COSMOS_DB_NAME="$dbName" \
+    COSMOS_CONTAINER_NAME="Tarefa" \
+    MAILJET_API_KEY="f1d2c3fa8fbab3a7932d746b28f26257" \
+    MAILJET_SECRET_KEY="b189e2bc3361bc8811c908682627785a" \
+    FUNCTIONS_WORKER_RUNTIME="python" \
+    FUNCTIONS_EXTENSION_VERSION="~4" \
+    AzureWebJobsStorage="$storageConnStr"
 
 # ================================
 # Conclusao
