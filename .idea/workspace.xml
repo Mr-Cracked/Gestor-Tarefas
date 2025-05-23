@@ -8,10 +8,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/deploy.bash" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/function/function_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/function/function_app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/function/local.settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/function/local.settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy.bash" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.bash" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +123,7 @@
       <workItem from="1744150164514" duration="6754000" />
       <workItem from="1744596771717" duration="24000" />
       <workItem from="1747952608756" duration="1535000" />
-      <workItem from="1748013909224" duration="322000" />
+      <workItem from="1748013909224" duration="5516000" />
     </task>
     <servers />
   </component>
