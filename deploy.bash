@@ -95,10 +95,43 @@ cosmosKey=$(az cosmosdb keys list --name "$cosmosName" --resource-group "$rg" --
 acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv | tr -d '\r')
 acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv | tr -d '\r')
 
+
+
+# ================================
+# Storage Account
+# ================================
+storageAccount="gestortarefasstor202203"
+echo -e "\nA criar Storage Account: $storageAccount..."
+az storage account create \
+  --name "$storageAccount" \
+  --location "$location" \
+  --resource-group "$rg" \
+  --sku Standard_LRS \
+  --kind StorageV2
+
+
+storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
+echo "DEBUG - storageConnStr: $storageConnStr"
+
+
 # ================================
 # Container Instance
 # ================================
-echo -e "\nA criar Container Instance com imagem '$imageName'..."
+
+echo "VALORES DAS VARIÁVEIS USADAS NO AZURE CONTAINER:"
+echo "-----------------------------------------------"
+echo "rg: $rg"
+echo "location: $location"
+echo "containerName: $containerName"
+echo "acrName: $acrName"
+echo "imageName: $imageName"
+echo "acrLoginServer: $acrLoginServer"
+echo "cosmosEndpoint: $cosmosEndpoint"
+echo "cosmosKey: $cosmosKey"
+echo "storageConnStr: $storageConnStr"
+echo "dnsLabel: $dnsLabel"
+echo "-----------------------------------------------"
+
 az container create \
   --resource-group "$rg" \
   --name "$containerName" \
@@ -112,6 +145,7 @@ az container create \
     PORT=3000 \
     COSMOS_DB_ENDPOINT="$cosmosEndpoint" \
     COSMOS_DB_KEY="$cosmosKey" \
+    AZURE_STORAGE_CONNECTION_STRING="$storageConnStr" \
   --ports 3000 \
   --dns-name-label "$dnsLabel" \
   --os-type Linux \
@@ -120,14 +154,7 @@ az container create \
 # ================================
 # Azure Function App + deploy GitHub
 # ================================
-storageAccount="gestortarefasstor202203"
-echo -e "\nA criar Storage Account: $storageAccount..."
-az storage account create \
-  --name "$storageAccount" \
-  --location "$location" \
-  --resource-group "$rg" \
-  --sku Standard_LRS \
-  --kind StorageV2
+
 
 functionAppName="GestorTarefasFunctionApp202203"
 echo -e "\nA criar Function App: $functionAppName..."
