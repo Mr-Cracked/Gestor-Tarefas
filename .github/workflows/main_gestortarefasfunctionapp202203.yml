@@ -40,10 +40,7 @@ jobs:
       # Optional: Add step to run tests here
 
       - name: Zip artifact for deployment
-        run: |
-          cd function
-          zip -r ../release.zip .
-          cd ..
+        run: zip -r release.zip function/
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
