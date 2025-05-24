@@ -33,6 +33,6 @@ jobs:
         uses: Azure/functions-action@v1
         with:
           app-name: 'GestorTarefasFunctionApp202203'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISH_PROFILE }}
           package: 'function'
 
