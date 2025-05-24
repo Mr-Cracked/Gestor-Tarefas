@@ -9,15 +9,13 @@ cosmosName="gestortarefas202203"
 dbName="GestorTarefasDB"
 containerName="gestor-tarefas-backend"
 dnsLabel="gestor-tarefas-api-compnuv"
-
-# Azure Container Registry
 acrName="gestortarefasacr202203"
 imageName="gestor-tarefas:latest"
 acrLoginServer="$acrName.azurecr.io"
-
-# GitHub
 gitRepo="https://github.com/Mr-Cracked/Gestor-Tarefas.git"
 gitBranch="main"
+functionAppName="GestorTarefasFunctionApp202203"
+storageAccount="gestortarefasstor202203"
 
 # ================================
 # Criar Resource Group
@@ -37,10 +35,7 @@ az cosmosdb create \
   --kind GlobalDocumentDB
 
 echo -e "\nA criar base de dados '$dbName'..."
-az cosmosdb sql database create \
-  --account-name "$cosmosName" \
-  --resource-group "$rg" \
-  --name "$dbName"
+az cosmosdb sql database create --account-name "$cosmosName" --resource-group "$rg" --name "$dbName"
 
 echo -e "\nA criar container 'Utilizador'..."
 az cosmosdb sql container create \
@@ -59,16 +54,10 @@ az cosmosdb sql container create \
   --partition-key-path "/email"
 
 # ================================
-# Azure Container Registry + Task
+# ACR + Build
 # ================================
 echo -e "\nA criar Azure Container Registry '$acrName'..."
-az acr create \
-  --resource-group "$rg" \
-  --name "$acrName" \
-  --sku Basic \
-  --location "$location"
-
-echo -e "\nA ativar o acesso administrativo ao ACR..."
+az acr create --resource-group "$rg" --name "$acrName" --sku Basic --location "$location"
 az acr update --name "$acrName" --resource-group "$rg" --admin-enabled true
 
 az acr task create \
@@ -89,11 +78,12 @@ az acr task run --registry "$acrName" --name build-task-gestor-tarefas --resourc
 # ================================
 # Obter credenciais
 # ================================
-cosmosEndpoint=$(az cosmosdb show --name "$cosmosName" --resource-group "$rg" --query "documentEndpoint" -o tsv | tr -d '\r')
-cosmosKey=$(az cosmosdb keys list --name "$cosmosName" --resource-group "$rg" --query "primaryMasterKey" -o tsv | tr -d '\r')
+cosmosEndpoint="https://gestortarefas202203.documents.azure.com:443/"
+cosmosKey="OGCk3OFtZcOtyaJWjRnvMiq2P3k6vuzNsmTtj5b52gMtHV0ehHkclwbRh9amebpGN3CQQDxv6ZcBACDbpJDMzw=="
+storageConnStr="DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=gestortarefasstor202203;AccountKey=khmP7yqy/LU55gY+VbOT39FNvjFlCcvMCzHTqvEk+o9lIMLq5EK0IdFepbs+xrKV02qdshNycoEx+ASttwChJA==;BlobEndpoint=https://gestortarefasstor202203.blob.core.windows.net/;FileEndpoint=https://gestortarefasstor202203.file.core.windows.net/;QueueEndpoint=https://gestortarefasstor202203.queue.core.windows.net/;TableEndpoint=https://gestortarefasstor202203.table.core.windows.net/"
 
-acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv | tr -d '\r')
-acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv | tr -d '\r')
+acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv)
+acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv)
 
 # ================================
 # Container Instance
@@ -118,9 +108,8 @@ az container create \
   --location "$location"
 
 # ================================
-# Azure Function App + deploy GitHub
+# Function App + Configurar
 # ================================
-storageAccount="gestortarefasstor202203"
 echo -e "\nA criar Storage Account: $storageAccount..."
 az storage account create \
   --name "$storageAccount" \
@@ -129,7 +118,6 @@ az storage account create \
   --sku Standard_LRS \
   --kind StorageV2
 
-functionAppName="GestorTarefasFunctionApp202203"
 echo -e "\nA criar Function App: $functionAppName..."
 az functionapp create \
   --name "$functionAppName" \
@@ -143,45 +131,38 @@ az functionapp create \
   --disable-app-insights true
 
 echo -e "\nA aguardar até que a Function App esteja pronta para receber definições..."
-
 for i in {1..15}; do
   state=$(az functionapp show --name "$functionAppName" --resource-group "$rg" --query "state" -o tsv 2>/dev/null)
   if [[ "$state" == "Running" ]]; then
-    echo "Function App está ativa. Continuar..."
+    echo "Function App está ativa."
     break
   fi
   echo "Ainda não está pronta... tentativa $i"
   sleep 10
 done
 
-
-storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
-
-echo -e "\nVALORES A USAR:"
-echo "COSMOS_DB_ENDPOINT=$cosmosEndpoint"
-echo "COSMOS_DB_KEY=$cosmosKey"
-echo "AzureWebJobsStorage=$storageConnStr"
-
-# Configurar variaveis de ambiente na Function App
+echo -e "\nA configurar variáveis de ambiente..."
 az functionapp config appsettings set \
   --name "$functionAppName" \
   --resource-group "$rg" \
   --settings \
-    "COSMOS_DB_ENDPOINT"=$cosmosEndpoint \
-    "COSMOS_DB_KEY"=$cosmosKey\
-    "COSMOS_DB_NAME"=$dbName \
-    "COSMOS_CONTAINER_NAME"=Tarefa \
-    "MAILJET_API_KEY"=f1d2c3fa8fbab3a7932d746b28f26257 \
-    "MAILJET_SECRET_KEY"=b189e2bc3361bc8811c908682627785a \
-    "FUNCTIONS_WORKER_RUNTIME"=python \
-    "FUNCTIONS_EXTENSION_VERSION"=~4 \
-    "AzureWebJobsStorage"=$storageConnStr
+    "COSMOS_DB_ENDPOINT=$cosmosEndpoint" \
+    "COSMOS_DB_KEY=$cosmosKey" \
+    "COSMOS_DB_NAME=$dbName" \
+    "COSMOS_CONTAINER_NAME=Tarefa" \
+    "MAILJET_API_KEY=f1d2c3fa8fbab3a7932d746b28f26257" \
+    "MAILJET_SECRET_KEY=b189e2bc3361bc8811c908682627785a" \
+    "FUNCTIONS_WORKER_RUNTIME=python" \
+    "FUNCTIONS_EXTENSION_VERSION=~4" \
+    "AzureWebJobsStorage=$storageConnStr" \
+  --output none \
+  && echo "Variáveis configuradas com sucesso." \
+  || echo "Erro ao configurar variáveis de ambiente."
 
 # ================================
-# Conclusao
+# Conclusão
 # ================================
 echo -e "\nInfraestrutura criada com sucesso."
 echo "URL publica do backend: http://$dnsLabel.$location.azurecontainer.io:3000"
 echo "Nome do ACR: $acrName"
 echo "Nome da Function: $functionAppName"
-echo -e "\nConfigura o GitHub Actions com o secret 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE' para publicar a Function automaticamente."
