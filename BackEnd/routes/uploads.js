@@ -12,9 +12,9 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Azure Blob Storage
-//const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
+const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
 const containerName = 'anexos';
-//const containerClient = blobServiceClient.getContainerClient(containerName);
+const containerClient = blobServiceClient.getContainerClient(containerName);
 
 // Upload
 router.post('/', upload.single('file'), async (req, res) => {

@@ -139,7 +139,6 @@ jobs:
           app-name: 'GestorTarefasFunctionApp202203'
 
           slot-name: 'Production'
-
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
 
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_f44bec2ac88e4dc4a7f47a2b257ef725 }}
