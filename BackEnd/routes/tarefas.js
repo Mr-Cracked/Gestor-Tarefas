@@ -9,8 +9,7 @@ dotenv.config();
 const router = express.Router();
 
 // Configuração do multer para ficheiros em memória
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ storage:multer.memoryStorage() });
 
 // Conexão com Cosmos DB
 const client = new CosmosClient({
