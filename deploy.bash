@@ -177,6 +177,15 @@ az functionapp config appsettings set \
     "FUNCTIONS_EXTENSION_VERSION"=~4 \
     "AzureWebJobsStorage"=$storageConnStr
 
+echo -e "\nA configurar publicação contínua via GitHub para a Function App..."
+az functionapp deployment source config \
+  --name "$functionAppName" \
+  --resource-group "$rg" \
+  --repo-url "$gitRepo" \
+  --branch "$gitBranch" \
+  --manual-integration
+
+
 # ================================
 # Conclusao
 # ================================
