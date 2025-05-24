@@ -78,9 +78,8 @@ az acr task run --registry "$acrName" --name build-task-gestor-tarefas --resourc
 # ================================
 # Obter credenciais
 # ================================
-cosmosEndpoint="https://gestortarefas202203.documents.azure.com:443/"
-cosmosKey="OGCk3OFtZcOtyaJWjRnvMiq2P3k6vuzNsmTtj5b52gMtHV0ehHkclwbRh9amebpGN3CQQDxv6ZcBACDbpJDMzw=="
-storageConnStr="DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=gestortarefasstor202203;AccountKey=khmP7yqy/LU55gY+VbOT39FNvjFlCcvMCzHTqvEk+o9lIMLq5EK0IdFepbs+xrKV02qdshNycoEx+ASttwChJA==;BlobEndpoint=https://gestortarefasstor202203.blob.core.windows.net/;FileEndpoint=https://gestortarefasstor202203.file.core.windows.net/;QueueEndpoint=https://gestortarefasstor202203.queue.core.windows.net/;TableEndpoint=https://gestortarefasstor202203.table.core.windows.net/"
+cosmosEndpoint=$(az cosmosdb show --name "$cosmosName" --resource-group "$rg" --query "documentEndpoint" -o tsv | tr -d '\r')
+cosmosKey=$(az cosmosdb keys list --name "$cosmosName" --resource-group "$rg" --query "primaryMasterKey" -o tsv | tr -d '\r')
 
 acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv)
 acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv)
@@ -140,6 +139,8 @@ for i in {1..15}; do
   echo "Ainda não está pronta... tentativa $i"
   sleep 10
 done
+
+storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
 
 echo -e "\nA configurar variáveis de ambiente..."
 az functionapp config appsettings set \
