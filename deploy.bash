@@ -142,17 +142,13 @@ az functionapp create \
   --storage-account "$storageAccount" \
   --disable-app-insights true
 
-echo -e "\nA aguardar até que a Function App esteja pronta para receber definições..."
+az functionapp deployment source config \
+  --name $functionAppName \
+  --resource-group $rg \
+  --repo-url $gitRepo \
+  --branch $gitBranch \
+  --manual-integration
 
-for i in {1..15}; do
-  state=$(az functionapp show --name "$functionAppName" --resource-group "$rg" --query "state" -o tsv 2>/dev/null)
-  if [[ "$state" == "Running" ]]; then
-    echo "Function App está ativa. Continuar..."
-    break
-  fi
-  echo "Ainda não está pronta... tentativa $i"
-  sleep 10
-done
 
 
 storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
@@ -167,15 +163,15 @@ az functionapp config appsettings set \
   --name "$functionAppName" \
   --resource-group "$rg" \
   --settings \
-    "COSMOS_DB_ENDPOINT"=$cosmosEndpoint \
-    "COSMOS_DB_KEY"=$cosmosKey\
-    "COSMOS_DB_NAME"=$dbName \
-    "COSMOS_CONTAINER_NAME"=Tarefa \
-    "MAILJET_API_KEY"=f1d2c3fa8fbab3a7932d746b28f26257 \
-    "MAILJET_SECRET_KEY"=b189e2bc3361bc8811c908682627785a \
-    "FUNCTIONS_WORKER_RUNTIME"=python \
-    "FUNCTIONS_EXTENSION_VERSION"=~4 \
-    "AzureWebJobsStorage"=$storageConnStr
+    COSMOS_DB_ENDPOINT=$cosmosEndpoint \
+    COSMOS_DB_KEY=$cosmosKey\
+    COSMOS_DB_NAME=$dbName \
+    COSMOS_CONTAINER_NAME=Tarefa \
+    MAILJET_API_KEY=f1d2c3fa8fbab3a7932d746b28f26257 \
+    MAILJET_SECRET_KEY=b189e2bc3361bc8811c908682627785a \
+    FUNCTIONS_WORKER_RUNTIME=python \
+    FUNCTIONS_EXTENSION_VERSION=~4 \
+    AzureWebJobsStorage=$storageConnStr
 
 echo -e "\nA configurar publicação contínua via GitHub para a Function App..."
 az functionapp deployment source config \
