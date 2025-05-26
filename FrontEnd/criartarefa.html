@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Criar Tarefa</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="container">
+  <div class="content">
+    <div class="left">
+      <div class="input-group">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo">
+      </div>
+      <div class="input-group">
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao"></textarea>
+      </div>
+      <div class="input-group" id="prazo-group">
+        <label for="prazo">Prazo</label>
+        <input type="date" id="prazo">
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="input-group">
+        <label for="prioridade">Prioridade</label>
+        <select id="prioridade">
+          <option value="">Selecione...</option>
+          <option value="Alta">Alta</option>
+          <option value="Média">Média</option>
+          <option value="Baixa">Baixa</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="imagem">Imagem</label>
+        <input type="file" id="imagem" accept="image/*">
+      </div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="cancelar" onclick="window.location.href='paginaprincipal.html'">CANCELAR</button>
+    <button class="confirmar" id="criar-btn">CRIAR</button>
+  </div>
+
+  <div class="logout">
+    <button class="logout-button">></button>
+  </div>
+</div>
+
+<!-- Incluir config.js antes do script principal -->
+<script src="config.js"></script>
+<script>
+  document.getElementById('criar-btn').addEventListener('click', function() {
+    const titulo = document.getElementById('titulo').value;
+    const descricao = document.getElementById('descricao').value;
+    const prazo = document.getElementById('prazo').value;
+    const prioridade = document.getElementById('prioridade').value;
+    const imagemInput = document.getElementById('imagem');
+    const API_URL = window.APP_CONFIG.API_URL;
+
+    // Validação simples
+    if (!titulo || !descricao || !prazo || !prioridade) {
+      alert("Por favor, preencha todos os campos obrigatórios!");
+      return;
+    }
+
+    // Se não há imagem, envia sem imagem
+    if (!imagemInput.files.length) {
+      fetch(API_URL + '/routes/tarefas/criar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titulo, descricao, prazo, prioridade })
+      })
+              .then(res => {
+                if (!res.ok) throw new Error("Erro ao criar tarefa");
+                return res.json();
+              })
+              .then(() => {
+                window.location.href = 'paginaprincipal.html';
+              })
+              .catch(err => {
+                alert("Erro ao criar tarefa: " + err.message);
+              });
+    } else {
+      // Enviar imagem com FormData
+      const formData = new FormData();
+      formData.append('titulo', titulo);
+      formData.append('descricao', descricao);
+      formData.append('prazo', prazo);
+      formData.append('prioridade', prioridade);
+      formData.append('imagem', imagemInput.files[0]);
+
+      fetch(API_URL + '/tarefas', {
+        method: 'POST',
+        body: formData
+      })
+              .then(res => {
+                if (!res.ok) throw new Error("Erro ao criar tarefa com imagem");
+                return res.json();
+              })
+              .then(() => {
+                window.location.href = 'paginaprincipal.html';
+              })
+              .catch(err => {
+                alert("Erro ao criar tarefa: " + err.message);
+              });
+    }
+  });
+</script>
+</body>
+</html>

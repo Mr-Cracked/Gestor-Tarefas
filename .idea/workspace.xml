@@ -8,8 +8,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/FrontEnd/config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy.bash" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.bash" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/routes/uploads.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/server.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,8 +91,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Shell Script.deploy.sh" />
         <item itemvalue="npm.start" />
+        <item itemvalue="Shell Script.deploy.sh" />
       </list>
     </recent_temporary>
   </component>
@@ -127,7 +129,9 @@
       <workItem from="1748054560321" duration="1241000" />
       <workItem from="1748062052201" duration="347000" />
       <workItem from="1748094431630" duration="1249000" />
-      <workItem from="1748117094071" duration="4100000" />
+      <workItem from="1748117094071" duration="4181000" />
+      <workItem from="1748122495826" duration="277000" />
+      <workItem from="1748289462978" duration="2156000" />
     </task>
     <servers />
   </component>

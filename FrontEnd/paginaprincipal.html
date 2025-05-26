@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <title>Página Principal</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<script>
+  function confirmarEliminacao(botao) {
+    const confirmado = confirm("Tem a certeza que deseja eliminar esta tarefa?");
+    if (confirmado) {
+      const card = botao.closest(".task-card");
+      if (card) {
+        card.remove();
+      }
+    }
+  }
+</script>
+
+<body>
+  <div class="container main-page">
+    <!-- botão logout -->
+    <button class="logout-button">▢</button>
+
+    <!-- lista de tarefas -->
+    <div class="tasks">
+      <div class="task-card">
+        <div class="task-info">
+          <p><strong>Título:</strong> Título</p>
+          <p><strong>descrição:</strong></p>
+          <p>DADDADADADA<br/>DADADADADA.<br/>…</p>
+        </div>
+        <div class="status">
+          <p><strong>prioridade:</strong> alta</p>
+          <p><strong>estado:</strong> a decorrer</p>
+        </div>
+        <div class="icons">
+          <button class="icon-btn">✎</button>
+          <button class="icon-btn">✖</button>
+        </div>
+      </div>
+
+      <div class="task-card">
+        <div class="task-info">
+          <p><strong>Título:</strong> Título</p>
+          <p><strong>descrição:</strong></p>
+          <p>DADDADADADA<br/>DADADADADA.<br/>…</p>
+        </div>
+        <div class="status">
+          <p><strong>prioridade:</strong> alta</p>
+          <p><strong>estado:</strong> a decorrer</p>
+        </div>
+        <div class="icons">
+          <a href="editartarefa.html" class="icon-btn">✎</a>
+            <button class="icon-btn" onclick="confirmarEliminacao(this)">✖</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- botão adicionar tarefa -->
+    <button class="add-btn">＋</button>
+     </div>
+         <script>
+              function confirmarEliminacao() {
+                  const confirmado = confirm("Tem a certeza que deseja eliminar esta tarefa?");
+                   if (confirmado) {
+                     alert("Tarefa eliminada.");
+    }
+  }
+</script>
+
+</body>
+</html>

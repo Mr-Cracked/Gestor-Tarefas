@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Tarefa</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="content">
+      <div class="left">
+        <div class="input-group">
+          <label for="titulo">Título</label>
+          <input type="text" id="titulo">
+        </div>
+        <div class="input-group">
+          <label for="descricao">Descrição</label>
+          <textarea id="descricao"></textarea>
+        </div>
+        <div class="input-group" id="prazo-group">
+            <label for="prazo">Prazo</label>
+            <input type="date" id="prazo">
+          </div>
+      </div>
+
+      <div class="right">
+        <div class="input-group">
+          <label for="prioridade">Prioridade</label>
+          <select id="prioridade">
+            <option value="">Selecione...</option>
+            <option value="">Alta</option>
+            <option value="">Média</option>
+            <option value="">Baixa</option>
+          </select>
+        </div>
+        <div class="input-group">
+            <label for="imagem">Imagem</label>
+            <input type="file" id="imagem" accept="image/*">
+          </div>         
+      </div>
+    </div>
+
+    <div class="buttons">
+        <button class="cancelar" onclick="window.location.href='paginaprincipal.html'">CANCELAR</button>
+        <button class="confirmar" onclick="window.location.href='paginaprincipal.html'">CONFIRMAR</button>
+    </div> 
+
+    <div class="logout">
+      <button class="logout-button">></button>
+    </div>
+  </div>
+</body>
+</html>

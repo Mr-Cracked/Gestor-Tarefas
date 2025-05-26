@@ -9,11 +9,10 @@ const dotenv = require('dotenv');
 
 
 const bodyParser = require('body-parser');
-const session = require('express-session')
+const session = require('express-session');
 
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tarefas');
-const uploadRoutes = require('./routes/uploads');
 
 dotenv.config();
 const app = express();
@@ -31,7 +30,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: 'lax',
         maxAge: 3600000
     }
