@@ -7,17 +7,16 @@ rg="gestorTarefasCN"
 location="francecentral"
 cosmosName="gestortarefas202203"
 dbName="GestorTarefasDB"
-containerName="gestor-tarefas-backend"
-dnsLabel="gestor-tarefas-api-compnuv"
-
-# Azure Container Registry
+containerAppName="gestor-tarefas-backend"
 acrName="gestortarefasacr202203"
 imageName="gestor-tarefas:latest"
 acrLoginServer="$acrName.azurecr.io"
-
-# GitHub
 gitRepo="https://github.com/Mr-Cracked/Gestor-Tarefas.git"
 gitBranch="main"
+storageAccount="gestortarefasstor202203"
+functionAppName="GestorTarefasFunctionApp202203"
+blobContainer="anexos"
+containerAppsEnv="gestor-tarefas-env"
 
 # ================================
 # Criar Resource Group
@@ -95,12 +94,37 @@ cosmosKey=$(az cosmosdb keys list --name "$cosmosName" --resource-group "$rg" --
 acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv | tr -d '\r')
 acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv | tr -d '\r')
 
-
+# ================================
+# Azure Container Apps Environment
+# ================================
+echo -e "\nA criar Container Apps Environment: $containerAppsEnv..."
+az containerapp env create \
+  --name "$containerAppsEnv" \
+  --resource-group "$rg" \
+  --location "$location"
 
 # ================================
-# Storage Account
+# Azure Container App
 # ================================
-storageAccount="gestortarefasstor202203"
+echo -e "\nA criar Container App com imagem '$imageName'..."
+az containerapp create \
+  --name "$containerAppName" \
+  --resource-group "$rg" \
+  --environment "$containerAppsEnv" \
+  --image "$acrLoginServer/$imageName" \
+  --target-port 3000 \
+  --ingress external \
+  --registry-server "$acrLoginServer" \
+  --registry-username "$acrUsername" \
+  --registry-password "$acrPassword" \
+  --env-vars \
+    PORT=3000 \
+    COSMOS_DB_ENDPOINT="$cosmosEndpoint" \
+    COSMOS_DB_KEY="$cosmosKey"
+
+# ================================
+# Azure Function App
+# ================================
 echo -e "\nA criar Storage Account: $storageAccount..."
 az storage account create \
   --name "$storageAccount" \
@@ -109,54 +133,6 @@ az storage account create \
   --sku Standard_LRS \
   --kind StorageV2
 
-
-storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
-echo "DEBUG - storageConnStr: $storageConnStr"
-
-
-# ================================
-# Container Instance
-# ================================
-
-echo "VALORES DAS VARIÁVEIS USADAS NO AZURE CONTAINER:"
-echo "-----------------------------------------------"
-echo "rg: $rg"
-echo "location: $location"
-echo "containerName: $containerName"
-echo "acrName: $acrName"
-echo "imageName: $imageName"
-echo "acrLoginServer: $acrLoginServer"
-echo "cosmosEndpoint: $cosmosEndpoint"
-echo "cosmosKey: $cosmosKey"
-echo "storageConnStr: $storageConnStr"
-echo "dnsLabel: $dnsLabel"
-echo "-----------------------------------------------"
-
-az container create \
-  --resource-group "$rg" \
-  --name "$containerName" \
-  --image "$acrLoginServer/$imageName" \
-  --cpu 1 \
-  --memory 1 \
-  --registry-login-server "$acrLoginServer" \
-  --registry-username "$acrUsername" \
-  --registry-password "$acrPassword" \
-  --environment-variables \
-    PORT=3000 \
-    COSMOS_DB_ENDPOINT="$cosmosEndpoint" \
-    COSMOS_DB_KEY="$cosmosKey" \
-    AZURE_STORAGE_CONNECTION_STRING="$storageConnStr" \
-  --ports 3000 \
-  --dns-name-label "$dnsLabel" \
-  --os-type Linux \
-  --location "$location"
-
-# ================================
-# Azure Function App + deploy GitHub
-# ================================
-
-
-functionAppName="GestorTarefasFunctionApp202203"
 echo -e "\nA criar Function App: $functionAppName..."
 az functionapp create \
   --name "$functionAppName" \
@@ -169,15 +145,18 @@ az functionapp create \
   --storage-account "$storageAccount" \
   --disable-app-insights true
 
-az functionapp deployment source config \
-  --name $functionAppName \
-  --resource-group $rg \
-  --repo-url $gitRepo \
-  --branch $gitBranch \
-  --manual-integration
+# ================================
+# Blob Storage - Criar container para anexos
+# ================================
+echo -e "\nA criar Blob Container: $blobContainer..."
+az storage container create \
+  --name "$blobContainer" \
+  --account-name "$storageAccount" \
+  --resource-group "$rg"
 
-
-
+# ================================
+# Variáveis de ambiente / App Settings
+# ================================
 storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
 
 echo -e "\nVALORES A USAR:"
@@ -185,35 +164,29 @@ echo "COSMOS_DB_ENDPOINT=$cosmosEndpoint"
 echo "COSMOS_DB_KEY=$cosmosKey"
 echo "AzureWebJobsStorage=$storageConnStr"
 
-# Configurar variaveis de ambiente na Function App
 az functionapp config appsettings set \
   --name "$functionAppName" \
   --resource-group "$rg" \
   --settings \
-    COSMOS_DB_ENDPOINT=$cosmosEndpoint \
-    COSMOS_DB_KEY=$cosmosKey\
-    COSMOS_DB_NAME=$dbName \
+    COSMOS_DB_ENDPOINT="$cosmosEndpoint" \
+    COSMOS_DB_KEY="$cosmosKey" \
+    COSMOS_DB_NAME="$dbName" \
     COSMOS_CONTAINER_NAME=Tarefa \
     MAILJET_API_KEY=f1d2c3fa8fbab3a7932d746b28f26257 \
     MAILJET_SECRET_KEY=b189e2bc3361bc8811c908682627785a \
     FUNCTIONS_WORKER_RUNTIME=python \
     FUNCTIONS_EXTENSION_VERSION=~4 \
-    AzureWebJobsStorage=$storageConnStr
-
-echo -e "\nA configurar publicação contínua via GitHub para a Function App..."
-az functionapp deployment source config \
-  --name "$functionAppName" \
-  --resource-group "$rg" \
-  --repo-url "$gitRepo" \
-  --branch "$gitBranch" \
-  --manual-integration
-
+    AzureWebJobsStorage="$storageConnStr" \
+    AZURE_STORAGE_CONNECTION_STRING="$storageConnStr"
 
 # ================================
 # Conclusao
 # ================================
+containerAppFqdn=$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query "configuration.ingress.fqdn" -o tsv)
+
 echo -e "\nInfraestrutura criada com sucesso."
-echo "URL publica do backend: http://$dnsLabel.$location.azurecontainer.io:3000"
+echo "URL publica do backend: https://$containerAppFqdn"
 echo "Nome do ACR: $acrName"
 echo "Nome da Function: $functionAppName"
-echo -e "\nConfigura o GitHub Actions com o secret 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE' para publicar a Function automaticamente."
+echo "Nome do Blob Container: $blobContainer"
+echo "Connection string para Blob Storage adicionada às App Settings (AZURE_STORAGE_CONNECTION_STRING)."

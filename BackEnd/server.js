@@ -38,8 +38,6 @@ app.use(session({
 
 app.use('/api/auth',authRoutes);
 app.use('/api/tarefas',taskRoutes);
-app.use('/api/uploads',uploadRoutes);
-
 
 app.listen(port, () => {
     console.log(`Server on in port: ${port}`);

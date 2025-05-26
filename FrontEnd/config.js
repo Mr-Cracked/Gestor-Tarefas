@@ -1,4 +1,4 @@
 // config.js
 window.APP_CONFIG = {
-    API_URL: "http://gestor-tarefas-api-compnuv.francecentral.azurecontainer.io:3000"
+    API_URL: "https://gestor-tarefas-backend.livelymeadow-737f77ac.francecentral.azurecontainerapps.io"
 };
