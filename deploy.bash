@@ -19,6 +19,7 @@ blobContainer="anexos"
 containerAppsEnv="gestor-tarefas-env"
 webappName="gestortarefasfrontend202203"
 planName="gestorTarefasPlan"
+frontendDir="Gestor-Tarefas/FrontEnd"
 
 # ================================
 # Criar Resource Group
@@ -26,45 +27,18 @@ planName="gestorTarefasPlan"
 az group create --name "$rg" --location "$location"
 
 # ================================
-# Cosmos DB + BD + Containers
+# Cosmos DB
 # ================================
-az cosmosdb create \
-  --name "$cosmosName" \
-  --resource-group "$rg" \
-  --locations regionName="$location" failoverPriority=0 \
-  --default-consistency-level Session \
-  --kind GlobalDocumentDB
-
-az cosmosdb sql database create \
-  --account-name "$cosmosName" \
-  --resource-group "$rg" \
-  --name "$dbName"
-
-az cosmosdb sql container create \
-  --account-name "$cosmosName" \
-  --resource-group "$rg" \
-  --database-name "$dbName" \
-  --name Utilizador \
-  --partition-key-path "/email"
-
-az cosmosdb sql container create \
-  --account-name "$cosmosName" \
-  --resource-group "$rg" \
-  --database-name "$dbName" \
-  --name Tarefa \
-  --partition-key-path "/email"
+az cosmosdb create --name "$cosmosName" --resource-group "$rg" --locations regionName="$location" failoverPriority=0 --default-consistency-level Session --kind GlobalDocumentDB
+az cosmosdb sql database create --account-name "$cosmosName" --resource-group "$rg" --name "$dbName"
+az cosmosdb sql container create --account-name "$cosmosName" --resource-group "$rg" --database-name "$dbName" --name Utilizador --partition-key-path "/email"
+az cosmosdb sql container create --account-name "$cosmosName" --resource-group "$rg" --database-name "$dbName" --name Tarefa --partition-key-path "/email"
 
 # ================================
-# Azure Container Registry + Task
+# Azure Container Registry + Build
 # ================================
-az acr create \
-  --resource-group "$rg" \
-  --name "$acrName" \
-  --sku Basic \
-  --location "$location"
-
+az acr create --resource-group "$rg" --name "$acrName" --sku Basic --location "$location"
 az acr update --name "$acrName" --resource-group "$rg" --admin-enabled true
-
 az acr task create \
   --registry "$acrName" \
   --name build-task-gestor-tarefas \
@@ -76,41 +50,27 @@ az acr task create \
   --commit-trigger-enabled false \
   --pull-request-trigger-enabled false \
   --base-image-trigger-enabled true
-
 az acr task run --registry "$acrName" --name build-task-gestor-tarefas --resource-group "$rg"
 
 # ================================
 # Obter credenciais
 # ================================
-cosmosEndpoint=$(az cosmosdb show --name "$cosmosName" --resource-group "$rg" --query "documentEndpoint" -o tsv | tr -d '\r')
-cosmosKey=$(az cosmosdb keys list --name "$cosmosName" --resource-group "$rg" --query "primaryMasterKey" -o tsv | tr -d '\r')
-
-acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv | tr -d '\r')
-acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv | tr -d '\r')
-
-# ================================
-# Azure Storage Account
-# ================================
-az storage account create \
-  --name "$storageAccount" \
-  --location "$location" \
-  --resource-group "$rg" \
-  --sku Standard_LRS \
-  --kind StorageV2
-
-storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
+cosmosEndpoint=$(az cosmosdb show --name "$cosmosName" --resource-group "$rg" --query "documentEndpoint" -o tsv)
+cosmosKey=$(az cosmosdb keys list --name "$cosmosName" --resource-group "$rg" --query "primaryMasterKey" -o tsv)
+acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv)
+acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv)
 
 # ================================
-# Azure Container Apps Environment
+# Storage Account
 # ================================
-az containerapp env create \
-  --name "$containerAppsEnv" \
-  --resource-group "$rg" \
-  --location "$location"
+az storage account create --name "$storageAccount" --location "$location" --resource-group "$rg" --sku Standard_LRS --kind StorageV2
+storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv)
+az storage container create --name "$blobContainer" --account-name "$storageAccount" --resource-group "$rg"
 
 # ================================
-# Azure Container App
+# Container App
 # ================================
+az containerapp env create --name "$containerAppsEnv" --resource-group "$rg" --location "$location"
 az containerapp create \
   --name "$containerAppName" \
   --resource-group "$rg" \
@@ -121,52 +81,12 @@ az containerapp create \
   --registry-server "$acrLoginServer" \
   --registry-username "$acrUsername" \
   --registry-password "$acrPassword" \
-  --env-vars \
-    PORT=3000 \
-    COSMOS_DB_ENDPOINT="$cosmosEndpoint" \
-    COSMOS_DB_KEY="$cosmosKey" \
-    AZURE_STORAGE_CONNECTION_STRING="$storageConnStr"
+  --env-vars PORT=3000 COSMOS_DB_ENDPOINT="$cosmosEndpoint" COSMOS_DB_KEY="$cosmosKey" AZURE_STORAGE_CONNECTION_STRING="$storageConnStr"
 
 # ================================
-# Azure Function App
+# Function App
 # ================================
-az functionapp create \
-  --name "$functionAppName" \
-  --resource-group "$rg" \
-  --consumption-plan-location "$location" \
-  --runtime python \
-  --runtime-version 3.11 \
-  --functions-version 4 \
-  --os-type Linux \
-  --storage-account "$storageAccount" \
-  --disable-app-insights true
-
-# ================================
-# Blob Storage - Criar container para anexos
-# ================================
-az storage container create \
-  --name "$blobContainer" \
-  --account-name "$storageAccount" \
-  --resource-group "$rg"
-
-# ================================
-# FRONTEND WEB APP
-# ================================
-# Apagar antigo se existir
-az webapp delete --name "$webappName" --resource-group "$rg"
-
-# Criar plano em Windows
-az appservice plan create --name "$planName" --resource-group "$rg" --location "$location" --sku S1
-
-# Criar Web App Windows
-az webapp create --name "$webappName" --resource-group "$rg" --plan "$planName"
-
-# Deploy automático da RAIZ do GitHub
-az webapp deployment source config --name "$webappName" --resource-group "$rg" --repo-url "$gitRepo" --branch "$gitBranch" --manual-integration
-
-# ================================
-# Variáveis de ambiente / App Settings (Function App)
-# ================================
+az functionapp create --name "$functionAppName" --resource-group "$rg" --consumption-plan-location "$location" --runtime python --runtime-version 3.11 --functions-version 4 --os-type Linux --storage-account "$storageAccount" --disable-app-insights true
 az functionapp config appsettings set \
   --name "$functionAppName" \
   --resource-group "$rg" \
@@ -183,8 +103,35 @@ az functionapp config appsettings set \
     AZURE_STORAGE_CONNECTION_STRING="$storageConnStr"
 
 # ================================
-# Conclusao
+# Web App para Frontend
+# ================================
+az webapp delete --name "$webappName" --resource-group "$rg"
+az appservice plan create --name "$planName" --resource-group "$rg" --location "$location" --sku S1
+az webapp create --name "$webappName" --resource-group "$rg" --plan "$planName"
+
+# ================================
+# Gerar config.js dinâmico
+# ================================
+backendURL="https://$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query 'configuration.ingress.fqdn' -o tsv)"
+echo "window.APP_CONFIG = { API_URL: \"$backendURL\" };" > "$frontendDir/config.js"
+
+# ================================
+# Zip e Deploy via curl (sem az webapp deploy)
+# ================================
+cd "$frontendDir"
+zip -r ../../frontend.zip ./*
+cd ../..
+
+publishProfile=$(az webapp deployment list-publishing-profiles --name "$webappName" --resource-group "$rg" --output json)
+user=$(echo "$publishProfile" | jq -r '.[] | select(.publishMethod=="MSDeploy") | .userName')
+pass=$(echo "$publishProfile" | jq -r '.[] | select(.publishMethod=="MSDeploy") | .userPWD')
+url=$(echo "$publishProfile" | jq -r '.[] | select(.publishMethod=="MSDeploy") | .publishUrl')
+
+curl -X POST "https://$url/api/zipdeploy" --user "$user:$pass" --data-binary @"./frontend.zip"
+
+# ================================
+# Final
 # ================================
 echo "Infraestrutura criada com sucesso."
-echo "URL publica do backend: https://$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query 'configuration.ingress.fqdn' -o tsv)"
-echo "URL publica do frontend: https://$webappName.azurewebsites.net/login.html"
+echo "URL do backend: $backendURL"
+echo "URL do frontend: https://$webappName.azurewebsites.net/login.html"
