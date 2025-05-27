@@ -61,11 +61,24 @@ acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv)
 acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv)
 
 # ================================
-# Storage Account
+# Storage Account + Blob público
 # ================================
 az storage account create --name "$storageAccount" --location "$location" --resource-group "$rg" --sku Standard_LRS --kind StorageV2
+
+# Ativar acesso público na conta
+az storage account update \
+  --name "$storageAccount" \
+  --resource-group "$rg" \
+  --allow-blob-public-access true
+
+# Criar container com acesso público ao blob
+az storage container create \
+  --name "$blobContainer" \
+  --account-name "$storageAccount" \
+  --resource-group "$rg" \
+  --public-access blob
+
 storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv)
-az storage container create --name "$blobContainer" --account-name "$storageAccount" --resource-group "$rg"
 
 # ================================
 # Container App
