@@ -19,7 +19,7 @@ blobContainer="anexos"
 containerAppsEnv="gestor-tarefas-env"
 webappName="gestortarefasfrontend202203"
 planName="gestorTarefasPlan"
-frontendDir="./frontend"
+frontendDir="./FrontEnd"
 backendEnvFile="./BackEnd/.env"
 
 # ================================
