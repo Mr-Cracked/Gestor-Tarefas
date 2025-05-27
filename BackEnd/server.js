@@ -32,10 +32,11 @@ app.use(session({
     cookie: {
         httpOnly: true,
         secure: true,
-        sameSite: 'lax',
+        sameSite: 'none',
         maxAge: 3600000
     }
 }));
+
 
 app.use('/api/auth',authRoutes);
 app.use('/api/tarefas',taskRoutes);
