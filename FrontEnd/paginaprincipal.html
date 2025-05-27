@@ -8,7 +8,7 @@
 <body>
 <div class="container main-page">
   <!-- botão logout -->
-  <button class="logout-button">▢</button>
+  <button class="logout-button" onclick="fazerLogout()">⎋</button>
 
   <!-- lista de tarefas -->
   <div class="tasks" id="tasks-list">
@@ -24,30 +24,45 @@
 <script>
   const API_URL = window.APP_CONFIG.API_URL;
 
-  // Função para criar um card de tarefa
-  function criarTaskCard(tarefa) {
-    // Ajusta o HTML conforme os campos reais do teu backend
-    const tarefaId = tarefa.id || tarefa._id;
-    return `
-        <div class="task-card" data-id="${tarefaId}">
-          <div class="task-info">
-            <p><strong>Título:</strong> ${tarefa.titulo || ''}</p>
-            <p><strong>Descrição:</strong></p>
-            <p>${tarefa.descricao ? tarefa.descricao.replace(/\n/g, '<br/>') : ''}</p>
-          </div>
-          <div class="status">
-            <p><strong>Prioridade:</strong> ${tarefa.prioridade || ''}</p>
-            <p><strong>Estado:</strong> ${tarefa.estado || 'a decorrer'}</p>
-          </div>
-          <div class="icons">
-            <a href="editartarefa.html?id=${tarefaId}" class="icon-btn">✎</a>
-            <button class="icon-btn" onclick="confirmarEliminacao(this)">✖</button>
-          </div>
-        </div>
-      `;
+  // Logout
+  function fazerLogout() {
+    fetch(API_URL + '/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("Erro ao fazer logout");
+              window.location.href = 'login.html';
+            })
+            .catch(err => {
+              alert("Erro ao terminar sessão: " + err.message);
+            });
   }
 
-  // Buscar tarefas do backend e inserir na página
+  // Criar card de tarefa
+  function criarTaskCard(tarefa) {
+    const tarefaId = tarefa.id || tarefa._id;
+    return `
+      <div class="task-card" data-id="${tarefaId}">
+        <div class="task-info">
+          <p><strong>Título:</strong> ${tarefa.titulo || ''}</p>
+          <p><strong>Descrição:</strong></p>
+          <p>${tarefa.descricao ? tarefa.descricao.replace(/\n/g, '<br/>') : ''}</p>
+        </div>
+        <div class="status">
+          <p><strong>Prioridade:</strong> ${tarefa.prioridade || ''}</p>
+          <p><strong>Estado:</strong> ${tarefa.estado || 'a decorrer'}</p>
+        </div>
+        <div class="icons">
+          <a href="vertarefa.html?id=${tarefaId}" class="icon-btn">🔍</a>
+          <a href="editartarefa.html?id=${tarefaId}" class="icon-btn">✎</a>
+          <button class="icon-btn" onclick="confirmarEliminacao(this)">✖</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Carregar tarefas
   function carregarTarefas() {
     fetch(API_URL + '/api/tarefas/listar', { credentials: 'include' })
             .then(res => {
@@ -68,7 +83,7 @@
             });
   }
 
-  // Função para eliminar tarefa
+  // Eliminar tarefa
   function confirmarEliminacao(botao) {
     const confirmado = confirm("Tem a certeza que deseja eliminar esta tarefa?");
     if (!confirmado) return;
@@ -87,10 +102,9 @@
             });
   }
 
-  // Expor a função no window para o onclick
   window.confirmarEliminacao = confirmarEliminacao;
 
-  // Carrega as tarefas ao abrir a página
+  // Iniciar
   carregarTarefas();
 </script>
 </body>

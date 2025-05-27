@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Ver Tarefa</title>
+  <title>Editar Tarefa</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,21 +11,21 @@
     <div class="left">
       <div class="input-group">
         <label for="titulo">Título</label>
-        <input type="text" id="titulo" disabled>
+        <input type="text" id="titulo">
       </div>
       <div class="input-group">
         <label for="descricao">Descrição</label>
-        <textarea id="descricao" disabled></textarea>
+        <textarea id="descricao"></textarea>
       </div>
       <div class="input-group" id="prazo-group">
         <label for="prazo">Prazo</label>
-        <input type="date" id="prazo" disabled>
+        <input type="date" id="prazo">
       </div>
     </div>
     <div class="right">
       <div class="input-group">
         <label for="prioridade">Prioridade</label>
-        <select id="prioridade" disabled>
+        <select id="prioridade">
           <option value="">Selecione...</option>
           <option value="Alta">Alta</option>
           <option value="Média">Média</option>
@@ -33,36 +33,39 @@
         </select>
       </div>
       <div class="input-group">
-        <label for="anexo">Imagem</label>
-        <img id="imagem-preview" style="max-width:100%;max-height:180px;display:none;">
+        <label for="anexo">Imagem (opcional)</label>
+        <input type="file" id="anexo" accept="image/*">
+        <img id="imagem-preview" style="max-width:100%; max-height:180px; display:none;">
       </div>
     </div>
   </div>
 
   <div class="buttons">
-    <button class="cancelar" onclick="window.location.href='paginaprincipal.html'">VOLTAR</button>
-    <button class="confirmar" id="editar-btn">EDITAR</button>
+    <button class="cancelar" onclick="window.location.href='paginaprincipal.html'">CANCELAR</button>
+    <button class="confirmar" onclick="guardarAlteracoes()">GUARDAR</button>
   </div>
 
   <div class="logout">
-    <button class="logout-button">></button>
+    <button class="logout-button" onclick="fazerLogout()">⎋</button>
   </div>
 </div>
 
-<!-- Config.js + script principal -->
 <script src="config.js"></script>
 <script>
-  function obterIdDaUrl() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('id');
+  const API_URL = window.APP_CONFIG.API_URL;
+  const id = new URLSearchParams(window.location.search).get('id');
+
+  if (!id) {
+    alert('ID da tarefa não especificado.');
+    window.location.href = 'paginaprincipal.html';
   }
 
-  function preencherCampos(tarefa) {
+  function preencherFormulario(tarefa) {
     document.getElementById('titulo').value = tarefa.titulo || '';
     document.getElementById('descricao').value = tarefa.descricao || '';
     document.getElementById('prazo').value = tarefa.prazo ? tarefa.prazo.substr(0, 10) : '';
     document.getElementById('prioridade').value = tarefa.prioridade || '';
-    // O campo correto vindo do backend é "anexos"
+
     if (tarefa.anexos) {
       const img = document.getElementById('imagem-preview');
       img.src = tarefa.anexos;
@@ -70,44 +73,70 @@
     }
   }
 
-  function mostrarErro(msg) {
-    alert(msg);
-    window.location.href = 'paginaprincipal.html';
-  }
-
-  // Ao carregar a página
-  document.addEventListener('DOMContentLoaded', function() {
-    const API_URL = window.APP_CONFIG.API_URL;
-    const id = obterIdDaUrl();
-    if (!id) {
-      mostrarErro('Tarefa não especificada.');
-      return;
-    }
-
+  function carregarTarefa() {
     fetch(`${API_URL}/api/tarefas/listar/${id}`, { credentials: 'include' })
             .then(res => {
-              if (!res.ok) throw new Error('Tarefa não encontrada.');
+              if (!res.ok) throw new Error("Erro ao buscar tarefa");
               return res.json();
             })
-            .then(resJson => {
-              // Garante que, se a resposta for array, vai buscar o primeiro elemento
-              if (Array.isArray(resJson) && resJson.length > 0) {
-                preencherCampos(resJson[0]);
-              } else if (resJson && !Array.isArray(resJson)) {
-                preencherCampos(resJson);
-              } else {
-                mostrarErro('Tarefa não encontrada.');
-              }
+            .then(data => {
+              const tarefa = Array.isArray(data) ? data[0] : data;
+              preencherFormulario(tarefa);
             })
             .catch(err => {
-              mostrarErro(err.message || 'Erro ao carregar tarefa.');
+              alert("Erro ao carregar tarefa: " + err.message);
+              window.location.href = 'paginaprincipal.html';
             });
+  }
 
-    // Botão Editar vai para editartarefa.html?id=...
-    document.getElementById('editar-btn').onclick = function() {
-      window.location.href = `editartarefa.html?id=${id}`;
-    };
-  });
+  function guardarAlteracoes() {
+    const titulo = document.getElementById('titulo').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+    const prazo = document.getElementById('prazo').value;
+    const prioridade = document.getElementById('prioridade').value;
+    const anexo = document.getElementById('anexo').files[0];
+
+    const formData = new FormData();
+    formData.append('titulo', titulo);
+    formData.append('descricao', descricao);
+    formData.append('prazo', prazo);
+    formData.append('prioridade', prioridade);
+    if (anexo) {
+      formData.append('anexo', anexo);
+    }
+
+    fetch(`${API_URL}/api/tarefas/${id}`, {
+      method: 'PUT',
+      body: formData,
+      credentials: 'include'
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("Erro ao atualizar tarefa");
+              return res.json();
+            })
+            .then(() => {
+              window.location.href = 'paginaprincipal.html';
+            })
+            .catch(err => {
+              alert("Erro ao guardar alterações: " + err.message);
+            });
+  }
+
+  function fazerLogout() {
+    fetch(API_URL + '/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("Erro ao fazer logout");
+              window.location.href = 'login.html';
+            })
+            .catch(err => {
+              alert("Erro ao terminar sessão: " + err.message);
+            });
+  }
+
+  document.addEventListener('DOMContentLoaded', carregarTarefa);
 </script>
 </body>
 </html>

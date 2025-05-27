@@ -45,12 +45,28 @@
   </div>
 
   <div class="logout">
-    <button class="logout-button">></button>
+    <button class="logout-button" onclick="fazerLogout()">⎋</button>
   </div>
 </div>
 
 <script src="config.js"></script>
 <script>
+
+  // Logout
+  function fazerLogout() {
+    fetch(API_URL + '/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("Erro ao fazer logout");
+              window.location.href = 'login.html';
+            })
+            .catch(err => {
+              alert("Erro ao terminar sessão: " + err.message);
+            });
+  }
+
   // Função para obter o ID da tarefa da query string (?id=...)
   function obterIdDaUrl() {
     const params = new URLSearchParams(window.location.search);
