@@ -10,6 +10,12 @@
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/criartarefa.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/criartarefa.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/editartarefa.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/editartarefa.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/paginaprincipal.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/paginaprincipal.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/registo.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/registo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/vertarefa.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/vertarefa.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deploy.bash" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.bash" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -130,7 +136,8 @@
       <workItem from="1748094431630" duration="1249000" />
       <workItem from="1748117094071" duration="4181000" />
       <workItem from="1748122495826" duration="277000" />
-      <workItem from="1748289462978" duration="3914000" />
+      <workItem from="1748289462978" duration="6109000" />
+      <workItem from="1748301265259" duration="3050000" />
     </task>
     <servers />
   </component>

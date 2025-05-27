@@ -17,6 +17,10 @@ storageAccount="gestortarefasstor202203"
 functionAppName="GestorTarefasFunctionApp202203"
 blobContainer="anexos"
 containerAppsEnv="gestor-tarefas-env"
+webappName="gestortarefasfrontend202203"
+planName="gestorTarefasPlan"
+frontendDir="./frontend"
+backendEnvFile="./BackEnd/.env"
 
 # ================================
 # Criar Resource Group
@@ -94,6 +98,20 @@ cosmosKey=$(az cosmosdb keys list --name "$cosmosName" --resource-group "$rg" --
 acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv | tr -d '\r')
 acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv | tr -d '\r')
 
+
+# ================================
+# Azure Storage Account
+# ================================
+echo -e "\nA criar Storage Account: $storageAccount..."
+az storage account create \
+  --name "$storageAccount" \
+  --location "$location" \
+  --resource-group "$rg" \
+  --sku Standard_LRS \
+  --kind StorageV2
+
+storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
+
 # ================================
 # Azure Container Apps Environment
 # ================================
@@ -120,18 +138,12 @@ az containerapp create \
   --env-vars \
     PORT=3000 \
     COSMOS_DB_ENDPOINT="$cosmosEndpoint" \
-    COSMOS_DB_KEY="$cosmosKey"
+    COSMOS_DB_KEY="$cosmosKey" \
+    AZURE_STORAGE_CONNECTION_STRING="$storageConnStr"
 
 # ================================
 # Azure Function App
 # ================================
-echo -e "\nA criar Storage Account: $storageAccount..."
-az storage account create \
-  --name "$storageAccount" \
-  --location "$location" \
-  --resource-group "$rg" \
-  --sku Standard_LRS \
-  --kind StorageV2
 
 echo -e "\nA criar Function App: $functionAppName..."
 az functionapp create \
@@ -155,10 +167,66 @@ az storage container create \
   --resource-group "$rg"
 
 # ================================
-# Variáveis de ambiente / App Settings
+# CRIAR O FRONTEND WEB APP (do zero)
 # ================================
-storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv | tr -d '\r')
+echo -e "\nA criar App Service Plan para o front-end..."
+az appservice plan create \
+  --name "$planName" \
+  --resource-group "$rg" \
+  --location "$location" \
+  --sku FREE \
+  --is-linux
 
+echo -e "\nA criar Web App para o front-end..."
+az webapp create \
+  --resource-group "$rg" \
+  --plan "$planName" \
+  --name "$webappName" \
+  --runtime "node|18-lts"
+
+# ================================
+# ATUALIZAR AUTOMATICAMENTE ENDPOINTS EM config.js E .env
+# ================================
+
+# 1. Obter os URLs públicos
+containerAppFqdn=$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query "configuration.ingress.fqdn" -o tsv)
+backendURL="https://$containerAppFqdn"
+frontendURL="https://$webappName.azurewebsites.net"
+
+echo -e "\nURLs detectados:"
+echo "FRONTEND_URL: $frontendURL"
+echo "BACKEND_URL:  $backendURL"
+
+# 2. Atualizar config.js no frontend
+configFile="$frontendDir/config.js"
+if [ -f "$configFile" ]; then
+    sed -i "s|API_URL: \".*\"|API_URL: \"$backendURL\"|g" "$configFile"
+    echo "config.js atualizado para usar o backend em $backendURL"
+else
+    echo "Aviso: $configFile não encontrado!"
+fi
+
+# 3. Atualizar .env no backend
+if [ -f "$backendEnvFile" ]; then
+    if grep -q "^FRONTEND_URL=" "$backendEnvFile"; then
+        sed -i "s|^FRONTEND_URL=.*|FRONTEND_URL=$frontendURL|g" "$backendEnvFile"
+    else
+        echo "FRONTEND_URL=$frontendURL" >> "$backendEnvFile"
+    fi
+    echo ".env atualizado para usar o front-end em $frontendURL"
+else
+    echo "Aviso: $backendEnvFile não encontrado!"
+fi
+
+# 4. Fazer zip do front-end e publicar no Web App
+cd "$frontendDir"
+zip -r ../frontend.zip .
+cd ..
+az webapp deployment source config-zip --resource-group "$rg" --name "$webappName" --src ./frontend.zip
+
+# ================================
+# Variáveis de ambiente / App Settings (Function App)
+# ================================
 echo -e "\nVALORES A USAR:"
 echo "COSMOS_DB_ENDPOINT=$cosmosEndpoint"
 echo "COSMOS_DB_KEY=$cosmosKey"
@@ -182,10 +250,9 @@ az functionapp config appsettings set \
 # ================================
 # Conclusao
 # ================================
-containerAppFqdn=$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query "configuration.ingress.fqdn" -o tsv)
-
 echo -e "\nInfraestrutura criada com sucesso."
-echo "URL publica do backend: https://$containerAppFqdn"
+echo "URL publica do backend: $backendURL"
+echo "URL publica do frontend: $frontendURL"
 echo "Nome do ACR: $acrName"
 echo "Nome da Function: $functionAppName"
 echo "Nome do Blob Container: $blobContainer"

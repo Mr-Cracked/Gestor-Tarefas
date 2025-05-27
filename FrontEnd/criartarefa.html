@@ -35,8 +35,8 @@
         </select>
       </div>
       <div class="input-group">
-        <label for="imagem">Imagem</label>
-        <input type="file" id="imagem" accept="image/*">
+        <label for="anexo">Imagem</label>
+        <input type="file" id="anexo" accept="image/*">
       </div>
     </div>
   </div>
@@ -59,7 +59,7 @@
     const descricao = document.getElementById('descricao').value;
     const prazo = document.getElementById('prazo').value;
     const prioridade = document.getElementById('prioridade').value;
-    const imagemInput = document.getElementById('imagem');
+    const imagemInput = document.getElementById('anexo'); // corrigido!
     const API_URL = window.APP_CONFIG.API_URL;
 
     // Validação simples
@@ -70,8 +70,9 @@
 
     // Se não há imagem, envia sem imagem
     if (!imagemInput.files.length) {
-      fetch(API_URL + '/routes/tarefas/criar', {
+      fetch(API_URL + '/api/tarefas/criar', {
         method: 'POST',
+        credentials: 'include' ,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ titulo, descricao, prazo, prioridade })
       })
@@ -92,10 +93,11 @@
       formData.append('descricao', descricao);
       formData.append('prazo', prazo);
       formData.append('prioridade', prioridade);
-      formData.append('imagem', imagemInput.files[0]);
+      formData.append('anexo', imagemInput.files[0]); // corrigido!
 
-      fetch(API_URL + '/tarefas', {
+      fetch(API_URL + '/api/tarefas/criar', {
         method: 'POST',
+        credentials: 'include' ,
         body: formData
       })
               .then(res => {

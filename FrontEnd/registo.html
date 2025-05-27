@@ -20,12 +20,18 @@
 <script src="config.js"></script>
 <script>
   document.getElementById('register-btn').addEventListener('click', function() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
     const API_URL = window.APP_CONFIG.API_URL;
 
-    fetch(API_URL + '/routes/auth/registar', {
+    if (!email || !password) {
+      alert("Por favor, preencha ambos os campos.");
+      return;
+    }
+
+    fetch(API_URL + '/api/auth/registar', {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -42,6 +48,13 @@
             .catch(err => {
               alert("Erro ao registar: " + err.message);
             });
+  });
+
+  // Permitir registo com Enter
+  document.getElementById('password').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('register-btn').click();
+    }
   });
 </script>
 </body>

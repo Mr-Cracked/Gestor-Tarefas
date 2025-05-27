@@ -2,53 +2,112 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Editar Tarefa</title>
+  <title>Ver Tarefa</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-  <div class="container">
-    <div class="content">
-      <div class="left">
-        <div class="input-group">
-          <label for="titulo">Título</label>
-          <input type="text" id="titulo">
-        </div>
-        <div class="input-group">
-          <label for="descricao">Descrição</label>
-          <textarea id="descricao"></textarea>
-        </div>
-        <div class="input-group" id="prazo-group">
-            <label for="prazo">Prazo</label>
-            <input type="date" id="prazo">
-          </div>
+<div class="container">
+  <div class="content">
+    <div class="left">
+      <div class="input-group">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo" disabled>
       </div>
-
-      <div class="right">
-        <div class="input-group">
-          <label for="prioridade">Prioridade</label>
-          <select id="prioridade">
-            <option value="">Selecione...</option>
-            <option value="">Alta</option>
-            <option value="">Média</option>
-            <option value="">Baixa</option>
-          </select>
-        </div>
-        <div class="input-group">
-            <label for="imagem">Imagem</label>
-            <input type="file" id="imagem" accept="image/*">
-          </div>         
+      <div class="input-group">
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" disabled></textarea>
+      </div>
+      <div class="input-group" id="prazo-group">
+        <label for="prazo">Prazo</label>
+        <input type="date" id="prazo" disabled>
       </div>
     </div>
-
-    <div class="buttons">
-        <button class="cancelar" onclick="window.location.href='paginaprincipal.html'">CANCELAR</button>
-        <button class="confirmar" onclick="window.location.href='paginaprincipal.html'">CONFIRMAR</button>
-    </div> 
-
-    <div class="logout">
-      <button class="logout-button">></button>
+    <div class="right">
+      <div class="input-group">
+        <label for="prioridade">Prioridade</label>
+        <select id="prioridade" disabled>
+          <option value="">Selecione...</option>
+          <option value="Alta">Alta</option>
+          <option value="Média">Média</option>
+          <option value="Baixa">Baixa</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="anexo">Imagem</label>
+        <img id="imagem-preview" style="max-width:100%;max-height:180px;display:none;">
+      </div>
     </div>
   </div>
+
+  <div class="buttons">
+    <button class="cancelar" onclick="window.location.href='paginaprincipal.html'">VOLTAR</button>
+    <button class="confirmar" id="editar-btn">EDITAR</button>
+  </div>
+
+  <div class="logout">
+    <button class="logout-button">></button>
+  </div>
+</div>
+
+<!-- Config.js + script principal -->
+<script src="config.js"></script>
+<script>
+  function obterIdDaUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
+  }
+
+  function preencherCampos(tarefa) {
+    document.getElementById('titulo').value = tarefa.titulo || '';
+    document.getElementById('descricao').value = tarefa.descricao || '';
+    document.getElementById('prazo').value = tarefa.prazo ? tarefa.prazo.substr(0, 10) : '';
+    document.getElementById('prioridade').value = tarefa.prioridade || '';
+    // O campo correto vindo do backend é "anexos"
+    if (tarefa.anexos) {
+      const img = document.getElementById('imagem-preview');
+      img.src = tarefa.anexos;
+      img.style.display = 'block';
+    }
+  }
+
+  function mostrarErro(msg) {
+    alert(msg);
+    window.location.href = 'paginaprincipal.html';
+  }
+
+  // Ao carregar a página
+  document.addEventListener('DOMContentLoaded', function() {
+    const API_URL = window.APP_CONFIG.API_URL;
+    const id = obterIdDaUrl();
+    if (!id) {
+      mostrarErro('Tarefa não especificada.');
+      return;
+    }
+
+    fetch(`${API_URL}/api/tarefas/listar/${id}`, { credentials: 'include' })
+            .then(res => {
+              if (!res.ok) throw new Error('Tarefa não encontrada.');
+              return res.json();
+            })
+            .then(resJson => {
+              // Garante que, se a resposta for array, vai buscar o primeiro elemento
+              if (Array.isArray(resJson) && resJson.length > 0) {
+                preencherCampos(resJson[0]);
+              } else if (resJson && !Array.isArray(resJson)) {
+                preencherCampos(resJson);
+              } else {
+                mostrarErro('Tarefa não encontrada.');
+              }
+            })
+            .catch(err => {
+              mostrarErro(err.message || 'Erro ao carregar tarefa.');
+            });
+
+    // Botão Editar vai para editartarefa.html?id=...
+    document.getElementById('editar-btn').onclick = function() {
+      window.location.href = `editartarefa.html?id=${id}`;
+    };
+  });
+</script>
 </body>
 </html>

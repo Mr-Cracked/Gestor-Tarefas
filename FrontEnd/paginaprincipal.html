@@ -5,70 +5,93 @@
   <title>Página Principal</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+<body>
+<div class="container main-page">
+  <!-- botão logout -->
+  <button class="logout-button">▢</button>
 
+  <!-- lista de tarefas -->
+  <div class="tasks" id="tasks-list">
+    <!-- As tarefas serão inseridas aqui por JavaScript -->
+  </div>
+
+  <!-- botão adicionar tarefa -->
+  <button class="add-btn" onclick="window.location.href='criartarefa.html'">＋</button>
+</div>
+
+<!-- Incluir config.js antes do script principal -->
+<script src="config.js"></script>
 <script>
+  const API_URL = window.APP_CONFIG.API_URL;
+
+  // Função para criar um card de tarefa
+  function criarTaskCard(tarefa) {
+    // Ajusta o HTML conforme os campos reais do teu backend
+    const tarefaId = tarefa.id || tarefa._id;
+    return `
+        <div class="task-card" data-id="${tarefaId}">
+          <div class="task-info">
+            <p><strong>Título:</strong> ${tarefa.titulo || ''}</p>
+            <p><strong>Descrição:</strong></p>
+            <p>${tarefa.descricao ? tarefa.descricao.replace(/\n/g, '<br/>') : ''}</p>
+          </div>
+          <div class="status">
+            <p><strong>Prioridade:</strong> ${tarefa.prioridade || ''}</p>
+            <p><strong>Estado:</strong> ${tarefa.estado || 'a decorrer'}</p>
+          </div>
+          <div class="icons">
+            <a href="editartarefa.html?id=${tarefaId}" class="icon-btn">✎</a>
+            <button class="icon-btn" onclick="confirmarEliminacao(this)">✖</button>
+          </div>
+        </div>
+      `;
+  }
+
+  // Buscar tarefas do backend e inserir na página
+  function carregarTarefas() {
+    fetch(API_URL + '/api/tarefas/listar', { credentials: 'include' })
+            .then(res => {
+              if (!res.ok) throw new Error('Erro ao buscar tarefas (HTTP ' + res.status + ')');
+              return res.json();
+            })
+            .then(tarefas => {
+              const tasksList = document.getElementById('tasks-list');
+              if (!tarefas || tarefas.length === 0) {
+                tasksList.innerHTML = "<p>Sem tarefas para mostrar.</p>";
+                return;
+              }
+              tasksList.innerHTML = tarefas.map(criarTaskCard).join('');
+            })
+            .catch(err => {
+              document.getElementById('tasks-list').innerHTML = `<p>Erro ao carregar tarefas.<br><small>${err.message || err}</small></p>`;
+              console.error(err);
+            });
+  }
+
+  // Função para eliminar tarefa
   function confirmarEliminacao(botao) {
     const confirmado = confirm("Tem a certeza que deseja eliminar esta tarefa?");
-    if (confirmado) {
-      const card = botao.closest(".task-card");
-      if (card) {
-        card.remove();
-      }
-    }
+    if (!confirmado) return;
+    const card = botao.closest(".task-card");
+    const id = card.getAttribute('data-id');
+    fetch(API_URL + '/api/tarefas/remover/' + id, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("Erro ao eliminar tarefa");
+              card.remove();
+            })
+            .catch(err => {
+              alert("Erro ao eliminar tarefa: " + err.message);
+            });
   }
+
+  // Expor a função no window para o onclick
+  window.confirmarEliminacao = confirmarEliminacao;
+
+  // Carrega as tarefas ao abrir a página
+  carregarTarefas();
 </script>
-
-<body>
-  <div class="container main-page">
-    <!-- botão logout -->
-    <button class="logout-button">▢</button>
-
-    <!-- lista de tarefas -->
-    <div class="tasks">
-      <div class="task-card">
-        <div class="task-info">
-          <p><strong>Título:</strong> Título</p>
-          <p><strong>descrição:</strong></p>
-          <p>DADDADADADA<br/>DADADADADA.<br/>…</p>
-        </div>
-        <div class="status">
-          <p><strong>prioridade:</strong> alta</p>
-          <p><strong>estado:</strong> a decorrer</p>
-        </div>
-        <div class="icons">
-          <button class="icon-btn">✎</button>
-          <button class="icon-btn">✖</button>
-        </div>
-      </div>
-
-      <div class="task-card">
-        <div class="task-info">
-          <p><strong>Título:</strong> Título</p>
-          <p><strong>descrição:</strong></p>
-          <p>DADDADADADA<br/>DADADADADA.<br/>…</p>
-        </div>
-        <div class="status">
-          <p><strong>prioridade:</strong> alta</p>
-          <p><strong>estado:</strong> a decorrer</p>
-        </div>
-        <div class="icons">
-          <a href="editartarefa.html" class="icon-btn">✎</a>
-            <button class="icon-btn" onclick="confirmarEliminacao(this)">✖</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- botão adicionar tarefa -->
-    <button class="add-btn">＋</button>
-     </div>
-         <script>
-              function confirmarEliminacao() {
-                  const confirmado = confirm("Tem a certeza que deseja eliminar esta tarefa?");
-                   if (confirmado) {
-                     alert("Tarefa eliminada.");
-    }
-  }
-</script>
-
 </body>
 </html>
