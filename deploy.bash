@@ -19,19 +19,15 @@ blobContainer="anexos"
 containerAppsEnv="gestor-tarefas-env"
 webappName="gestortarefasfrontend202203"
 planName="gestorTarefasPlan"
-frontendDir="./FrontEnd"
-backendEnvFile="./BackEnd/.env"
 
 # ================================
 # Criar Resource Group
 # ================================
-echo -e "\nA criar Resource Group: $rg..."
 az group create --name "$rg" --location "$location"
 
 # ================================
 # Cosmos DB + BD + Containers
 # ================================
-echo -e "\nA criar conta Cosmos DB: $cosmosName..."
 az cosmosdb create \
   --name "$cosmosName" \
   --resource-group "$rg" \
@@ -39,13 +35,11 @@ az cosmosdb create \
   --default-consistency-level Session \
   --kind GlobalDocumentDB
 
-echo -e "\nA criar base de dados '$dbName'..."
 az cosmosdb sql database create \
   --account-name "$cosmosName" \
   --resource-group "$rg" \
   --name "$dbName"
 
-echo -e "\nA criar container 'Utilizador'..."
 az cosmosdb sql container create \
   --account-name "$cosmosName" \
   --resource-group "$rg" \
@@ -53,7 +47,6 @@ az cosmosdb sql container create \
   --name Utilizador \
   --partition-key-path "/email"
 
-echo -e "\nA criar container 'Tarefa'..."
 az cosmosdb sql container create \
   --account-name "$cosmosName" \
   --resource-group "$rg" \
@@ -64,14 +57,12 @@ az cosmosdb sql container create \
 # ================================
 # Azure Container Registry + Task
 # ================================
-echo -e "\nA criar Azure Container Registry '$acrName'..."
 az acr create \
   --resource-group "$rg" \
   --name "$acrName" \
   --sku Basic \
   --location "$location"
 
-echo -e "\nA ativar o acesso administrativo ao ACR..."
 az acr update --name "$acrName" --resource-group "$rg" --admin-enabled true
 
 az acr task create \
@@ -86,7 +77,6 @@ az acr task create \
   --pull-request-trigger-enabled false \
   --base-image-trigger-enabled true
 
-echo -e "\nA executar build inicial do ACR Task..."
 az acr task run --registry "$acrName" --name build-task-gestor-tarefas --resource-group "$rg"
 
 # ================================
@@ -98,11 +88,9 @@ cosmosKey=$(az cosmosdb keys list --name "$cosmosName" --resource-group "$rg" --
 acrUsername=$(az acr credential show --name "$acrName" --query username -o tsv | tr -d '\r')
 acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].value -o tsv | tr -d '\r')
 
-
 # ================================
 # Azure Storage Account
 # ================================
-echo -e "\nA criar Storage Account: $storageAccount..."
 az storage account create \
   --name "$storageAccount" \
   --location "$location" \
@@ -115,7 +103,6 @@ storageConnStr=$(az storage account show-connection-string --name "$storageAccou
 # ================================
 # Azure Container Apps Environment
 # ================================
-echo -e "\nA criar Container Apps Environment: $containerAppsEnv..."
 az containerapp env create \
   --name "$containerAppsEnv" \
   --resource-group "$rg" \
@@ -124,7 +111,6 @@ az containerapp env create \
 # ================================
 # Azure Container App
 # ================================
-echo -e "\nA criar Container App com imagem '$imageName'..."
 az containerapp create \
   --name "$containerAppName" \
   --resource-group "$rg" \
@@ -144,8 +130,6 @@ az containerapp create \
 # ================================
 # Azure Function App
 # ================================
-
-echo -e "\nA criar Function App: $functionAppName..."
 az functionapp create \
   --name "$functionAppName" \
   --resource-group "$rg" \
@@ -160,78 +144,29 @@ az functionapp create \
 # ================================
 # Blob Storage - Criar container para anexos
 # ================================
-echo -e "\nA criar Blob Container: $blobContainer..."
 az storage container create \
   --name "$blobContainer" \
   --account-name "$storageAccount" \
   --resource-group "$rg"
 
 # ================================
-# CRIAR O FRONTEND WEB APP (do zero)
+# FRONTEND WEB APP
 # ================================
-echo -e "\nA criar App Service Plan para o front-end..."
-az appservice plan create \
-  --name "$planName" \
-  --resource-group "$rg" \
-  --location "$location" \
-  --sku FREE \
-  --is-linux
+# Apagar antigo se existir
+az webapp delete --name "$webappName" --resource-group "$rg"
 
-echo -e "\nA criar Web App para o front-end..."
-az webapp create \
-  --resource-group "$rg" \
-  --plan "$planName" \
-  --name "$webappName" \
-  --runtime "node|18-lts"
+# Criar plano em Windows
+az appservice plan create --name "$planName" --resource-group "$rg" --location "$location" --sku S1
 
-# ================================
-# ATUALIZAR AUTOMATICAMENTE ENDPOINTS EM config.js E .env
-# ================================
+# Criar Web App Windows
+az webapp create --name "$webappName" --resource-group "$rg" --plan "$planName"
 
-# 1. Obter os URLs públicos
-containerAppFqdn=$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query "configuration.ingress.fqdn" -o tsv)
-backendURL="https://$containerAppFqdn"
-frontendURL="https://$webappName.azurewebsites.net"
-
-echo -e "\nURLs detectados:"
-echo "FRONTEND_URL: $frontendURL"
-echo "BACKEND_URL:  $backendURL"
-
-# 2. Atualizar config.js no frontend
-configFile="$frontendDir/config.js"
-if [ -f "$configFile" ]; then
-    sed -i "s|API_URL: \".*\"|API_URL: \"$backendURL\"|g" "$configFile"
-    echo "config.js atualizado para usar o backend em $backendURL"
-else
-    echo "Aviso: $configFile não encontrado!"
-fi
-
-# 3. Atualizar .env no backend
-if [ -f "$backendEnvFile" ]; then
-    if grep -q "^FRONTEND_URL=" "$backendEnvFile"; then
-        sed -i "s|^FRONTEND_URL=.*|FRONTEND_URL=$frontendURL|g" "$backendEnvFile"
-    else
-        echo "FRONTEND_URL=$frontendURL" >> "$backendEnvFile"
-    fi
-    echo ".env atualizado para usar o front-end em $frontendURL"
-else
-    echo "Aviso: $backendEnvFile não encontrado!"
-fi
-
-# 4. Fazer zip do front-end e publicar no Web App
-cd "$frontendDir"
-zip -r ../frontend.zip .
-cd ..
-az webapp deployment source config-zip --resource-group "$rg" --name "$webappName" --src ./frontend.zip
+# Deploy automático da RAIZ do GitHub
+az webapp deployment source config --name "$webappName" --resource-group "$rg" --repo-url "$gitRepo" --branch "$gitBranch" --manual-integration
 
 # ================================
 # Variáveis de ambiente / App Settings (Function App)
 # ================================
-echo -e "\nVALORES A USAR:"
-echo "COSMOS_DB_ENDPOINT=$cosmosEndpoint"
-echo "COSMOS_DB_KEY=$cosmosKey"
-echo "AzureWebJobsStorage=$storageConnStr"
-
 az functionapp config appsettings set \
   --name "$functionAppName" \
   --resource-group "$rg" \
@@ -250,10 +185,6 @@ az functionapp config appsettings set \
 # ================================
 # Conclusao
 # ================================
-echo -e "\nInfraestrutura criada com sucesso."
-echo "URL publica do backend: $backendURL"
-echo "URL publica do frontend: $frontendURL"
-echo "Nome do ACR: $acrName"
-echo "Nome da Function: $functionAppName"
-echo "Nome do Blob Container: $blobContainer"
-echo "Connection string para Blob Storage adicionada às App Settings (AZURE_STORAGE_CONNECTION_STRING)."
+echo "Infraestrutura criada com sucesso."
+echo "URL publica do backend: https://$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query 'configuration.ingress.fqdn' -o tsv)"
+echo "URL publica do frontend: https://$webappName.azurewebsites.net/login.html"
