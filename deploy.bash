@@ -1,20 +1,21 @@
 #!/bin/bash
 
 # ================================
-# Parametros principais
+# Parâmetros principais
 # ================================
 rg="gestorTarefasCN"
 location="francecentral"
 cosmosName="gestortarefas202203"
 dbName="GestorTarefasDB"
 containerAppName="gestor-tarefas-backend"
+dnsLabel="gestor-tarefas-api-compnuv"
 acrName="gestortarefasacr202203"
 imageName="gestor-tarefas:latest"
 acrLoginServer="$acrName.azurecr.io"
 gitRepo="https://github.com/Mr-Cracked/Gestor-Tarefas.git"
 gitBranch="main"
 storageAccount="gestortarefasstor202203"
-functionAppName="GestorTarefasFunctionApp202203"
+functionAppName="GestorTarefasFunctionApp2022034"
 blobContainer="anexos"
 containerAppsEnv="gestor-tarefas-env"
 webappName="gestortarefasfrontend202203"
@@ -65,23 +66,13 @@ acrPassword=$(az acr credential show --name "$acrName" --query passwords[0].valu
 # ================================
 az storage account create --name "$storageAccount" --location "$location" --resource-group "$rg" --sku Standard_LRS --kind StorageV2
 
-# Ativar acesso público na conta
-az storage account update \
-  --name "$storageAccount" \
-  --resource-group "$rg" \
-  --allow-blob-public-access true
-
-# Criar container com acesso público ao blob
-az storage container create \
-  --name "$blobContainer" \
-  --account-name "$storageAccount" \
-  --resource-group "$rg" \
-  --public-access blob
+az storage account update --name "$storageAccount" --resource-group "$rg" --allow-blob-public-access true
+az storage container create --name "$blobContainer" --account-name "$storageAccount" --resource-group "$rg" --public-access blob
 
 storageConnStr=$(az storage account show-connection-string --name "$storageAccount" --resource-group "$rg" -o tsv)
 
 # ================================
-# Container App
+# Container App (Back-end)
 # ================================
 az containerapp env create --name "$containerAppsEnv" --resource-group "$rg" --location "$location"
 az containerapp create \
@@ -97,9 +88,10 @@ az containerapp create \
   --env-vars PORT=3000 COSMOS_DB_ENDPOINT="$cosmosEndpoint" COSMOS_DB_KEY="$cosmosKey" AZURE_STORAGE_CONNECTION_STRING="$storageConnStr"
 
 # ================================
-# Function App
+# Azure Function App
 # ================================
 az functionapp create --name "$functionAppName" --resource-group "$rg" --consumption-plan-location "$location" --runtime python --runtime-version 3.11 --functions-version 4 --os-type Linux --storage-account "$storageAccount" --disable-app-insights true
+
 az functionapp config appsettings set \
   --name "$functionAppName" \
   --resource-group "$rg" \
@@ -108,28 +100,28 @@ az functionapp config appsettings set \
     COSMOS_DB_KEY="$cosmosKey" \
     COSMOS_DB_NAME="$dbName" \
     COSMOS_CONTAINER_NAME=Tarefa \
-    MAILJET_API_KEY=f1d2c3fa8fbab3a7932d746b28f26257 \
-    MAILJET_SECRET_KEY=b189e2bc3361bc8811c908682627785a \
+    MAILJET_API_KEY="f1d2c3fa8fbab3a7932d746b28f26257" \
+    MAILJET_SECRET_KEY="b189e2bc3361bc8811c908682627785a" \
     FUNCTIONS_WORKER_RUNTIME=python \
     FUNCTIONS_EXTENSION_VERSION=~4 \
     AzureWebJobsStorage="$storageConnStr" \
     AZURE_STORAGE_CONNECTION_STRING="$storageConnStr"
 
 # ================================
-# Web App para Frontend
+# Web App para Frontend (React)
 # ================================
 az webapp delete --name "$webappName" --resource-group "$rg"
 az appservice plan create --name "$planName" --resource-group "$rg" --location "$location" --sku S1
 az webapp create --name "$webappName" --resource-group "$rg" --plan "$planName"
 
 # ================================
-# Gerar config.js dinâmico
+# Gerar config.js com URL do backend
 # ================================
 backendURL="https://$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query 'configuration.ingress.fqdn' -o tsv)"
 echo "window.APP_CONFIG = { API_URL: \"$backendURL\" };" > "$frontendDir/config.js"
 
 # ================================
-# Zip e Deploy via curl (sem az webapp deploy)
+# Zipar e fazer deploy via curl
 # ================================
 cd "$frontendDir"
 zip -r ../../frontend.zip ./*
@@ -145,6 +137,6 @@ curl -X POST "https://$url/api/zipdeploy" --user "$user:$pass" --data-binary @".
 # ================================
 # Final
 # ================================
-echo "Infraestrutura criada com sucesso."
-echo "URL do backend: $backendURL"
-echo "URL do frontend: https://$webappName.azurewebsites.net/login.html"
+echo "✅ Infraestrutura criada com sucesso."
+echo "🔗 Backend: $backendURL"
+echo "🔗 Frontend: https://$webappName.azurewebsites.net/login.html"
