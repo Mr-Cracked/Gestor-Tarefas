@@ -17,11 +17,10 @@ const taskRoutes = require('./routes/tarefas');
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
-const FRONTEND_URL = 'https://gestortarefasfrontend202203.azurewebsites.net';
 
 
 app.use(cors({
-    origin: FRONTEND_URL,
+    origin: true,
     credentials: true
 }));
 app.use(bodyParser.json());
