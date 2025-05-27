@@ -15,7 +15,7 @@ acrLoginServer="$acrName.azurecr.io"
 gitRepo="https://github.com/Mr-Cracked/Gestor-Tarefas.git"
 gitBranch="main"
 storageAccount="gestortarefasstor202203"
-functionAppName="GestorTarefasFunctionApp2022034"
+functionAppName="GestorTarefasFunctionApp202203"
 blobContainer="anexos"
 containerAppsEnv="gestor-tarefas-env"
 webappName="gestortarefasfrontend202203"
@@ -108,35 +108,41 @@ az functionapp config appsettings set \
     AZURE_STORAGE_CONNECTION_STRING="$storageConnStr"
 
 # ================================
-# Web App para Frontend (React)
+# FRONTEND WEB APP
 # ================================
 az webapp delete --name "$webappName" --resource-group "$rg"
 az appservice plan create --name "$planName" --resource-group "$rg" --location "$location" --sku S1
 az webapp create --name "$webappName" --resource-group "$rg" --plan "$planName"
 
 # ================================
-# Gerar config.js com URL do backend
+# Clonar repositório
 # ================================
-backendURL="https://$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query 'configuration.ingress.fqdn' -o tsv)"
-echo "window.APP_CONFIG = { API_URL: \"$backendURL\" };" > "$frontendDir/config.js"
+echo -e "\nA clonar o repositório..."
+git clone --branch "$gitBranch" "$gitRepo"
+
 
 # ================================
-# Zipar e fazer deploy via curl
+# Gerar config.js e criar ZIP
 # ================================
+backendURL="https://$(az containerapp show --name "$containerAppName" --resource-group "$rg" --query 'configuration.ingress.fqdn' -o tsv)"
+
+echo "window.APP_CONFIG = { API_URL: \"$backendURL\" };" > "$frontendDir/config.js"
+
 cd "$frontendDir"
 zip -r ../../frontend.zip ./*
 cd ../..
 
-publishProfile=$(az webapp deployment list-publishing-profiles --name "$webappName" --resource-group "$rg" --output json)
-user=$(echo "$publishProfile" | jq -r '.[] | select(.publishMethod=="MSDeploy") | .userName')
-pass=$(echo "$publishProfile" | jq -r '.[] | select(.publishMethod=="MSDeploy") | .userPWD')
-url=$(echo "$publishProfile" | jq -r '.[] | select(.publishMethod=="MSDeploy") | .publishUrl')
 
-curl -X POST "https://$url/api/zipdeploy" --user "$user:$pass" --data-binary @"./frontend.zip"
+# ================================
+# Deploy do ZIP via az webapp
+# ================================
+az webapp deploy --resource-group "$rg" --name "$webappName" --src-path frontend.zip --type zip
+
+
 
 # ================================
 # Final
 # ================================
-echo "✅ Infraestrutura criada com sucesso."
-echo "🔗 Backend: $backendURL"
-echo "🔗 Frontend: https://$webappName.azurewebsites.net/login.html"
+echo "Infraestrutura criada com sucesso."
+echo "Backend: $backendURL"
+echo "Frontend: https://$webappName.azurewebsites.net/login.html"
