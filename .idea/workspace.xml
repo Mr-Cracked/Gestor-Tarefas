@@ -9,10 +9,6 @@
   <component name="ChangeListManager">
     <list default="true" id="e66af084-61a2-4696-8374-8cfbd55ce2db" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/criartarefa.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/criartarefa.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/editartarefa.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/editartarefa.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/paginaprincipal.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/paginaprincipal.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/vertarefa.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/vertarefa.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,25 +33,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "Shell Script.deploy.sh.executor": "Run",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/school/MeuIPCB",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.start.executor": "Run",
-    "settings.editor.selected.configurable": "terminal",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2024.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Shell Script.deploy.sh.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/school/MeuIPCB&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\guiro\Desktop\Escola\3 Ano\2º semestre\CN\Gestor-Tarefas\function" />
@@ -134,7 +130,8 @@
       <workItem from="1748117094071" duration="4181000" />
       <workItem from="1748122495826" duration="277000" />
       <workItem from="1748289462978" duration="6109000" />
-      <workItem from="1748301265259" duration="18725000" />
+      <workItem from="1748301265259" duration="19079000" />
+      <workItem from="1748355190414" duration="500000" />
     </task>
     <servers />
   </component>

@@ -14,7 +14,7 @@ acrLoginServer="$acrName.azurecr.io"
 gitRepo="https://github.com/Mr-Cracked/Gestor-Tarefas.git"
 gitBranch="main"
 storageAccount="gestortarefasstor202203"
-functionAppName="GestorTarefasFunctionApp202203"
+functionAppName="GestorTarefasFunctionApp2022033"
 blobContainer="anexos"
 containerAppsEnv="gestor-tarefas-env"
 webappName="gestortarefasfrontend202203"
@@ -99,10 +99,15 @@ az containerapp create \
 # ================================
 # Function App
 # ================================
+gitRepo="https://github.com/Mr-Cracked/Gestor-Tarefas/tree/main/function"
+
 az functionapp create --name "$functionAppName" --resource-group "$rg" --consumption-plan-location "$location" --runtime python --runtime-version 3.11 --functions-version 4 --os-type Linux --storage-account "$storageAccount" --disable-app-insights true
 az functionapp config appsettings set \
   --name "$functionAppName" \
   --resource-group "$rg" \
+  --repo-url https://github.com/Mr-Cracked/Gestor-Tarefas.git \
+  --branch main \
+  --manual-integration \
   --settings \
     COSMOS_DB_ENDPOINT="$cosmosEndpoint" \
     COSMOS_DB_KEY="$cosmosKey" \
